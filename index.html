@@ -201,7 +201,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="period-bar">
       <button class="period-btn" onclick="setPeriod('today')">今天</button>
       <button class="period-btn active" onclick="setPeriod('month')">本月</button>
+      <button class="period-btn" onclick="setPeriod('pick')">選月份</button>
       <button class="period-btn" onclick="setPeriod('all')">全部</button>
+    </div>
+    <div id="monthPicker" style="display:none;margin-bottom:12px">
+      <select id="monthSelect" onchange="renderStats()" style="width:100%;padding:8px 12px;border:0.5px solid var(--mt-border2);border-radius:10px;background:var(--mt-card);color:var(--mt-text);font-size:14px;font-weight:500;outline:none"></select>
     </div>
     <div class="stat-cards">
       <div class="stat-card"><div class="stat-card-label">訂單數</div><div class="stat-card-val" id="sOrders">0</div><div class="stat-card-sub">筆</div></div>
@@ -284,8 +288,31 @@ function switchTab(t){
 }
 function setPeriod(p){
   curPeriod=p;
-  document.querySelectorAll('.period-btn').forEach((b,i)=>b.classList.toggle('active',['today','month','all'][i]===p));
+  document.querySelectorAll('.period-btn').forEach((b,i)=>b.classList.toggle('active',['today','month','pick','all'][i]===p));
+  const picker=document.getElementById('monthPicker');
+  if(p==='pick'){
+    picker.style.display='block';
+    populateMonthSelect();
+  } else {
+    picker.style.display='none';
+  }
   renderStats();
+}
+
+function populateMonthSelect(){
+  const sel=document.getElementById('monthSelect');
+  const months={};
+  orders.forEach(o=>{
+    const d=new Date(o.date);
+    const key=d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');
+    months[key]=true;
+  });
+  const sorted=Object.keys(months).sort().reverse();
+  if(!sorted.length){sel.innerHTML='<option>尚無記錄</option>';return;}
+  sel.innerHTML=sorted.map(k=>{
+    const [y,m]=k.split('-');
+    return`<option value="${k}">${y} 年 ${parseInt(m)} 月</option>`;
+  }).join('');
 }
 function addItem(){items.push({id:nid++,type:'preset',pi:0,pt:'r0',qty:1});renderItems();}
 function addCustom(){items.push({id:nid++,type:'custom',name:'',cost:'',price:'',qty:1});renderItems();}
@@ -387,7 +414,9 @@ function deleteOrder(id){if(!confirm('確定刪除？'))return;orders=orders.fil
 function deletePeriod(){
   const filtered=filterOrders();
   if(!filtered.length)return;
-  const labels={today:'今天',month:'本月',all:'全部'};
+  const sel=document.getElementById('monthSelect');
+  const pickLabel=sel&&sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'選定月份';
+  const labels={today:'今天',month:'本月',pick:pickLabel,all:'全部'};
   if(!confirm(`確定刪除「${labels[curPeriod]}」共 ${filtered.length} 筆訂單？此動作無法復原。`))return;
   const ids=new Set(filtered.map(o=>o.id));
   orders=orders.filter(o=>!ids.has(o.id));
@@ -398,6 +427,12 @@ function filterOrders(){
   const now=new Date();
   if(curPeriod==='today'){const t=now.toDateString();return orders.filter(o=>new Date(o.date).toDateString()===t);}
   if(curPeriod==='month'){return orders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});}
+  if(curPeriod==='pick'){
+    const sel=document.getElementById('monthSelect');
+    if(!sel||!sel.value)return orders;
+    const [y,m]=sel.value.split('-').map(Number);
+    return orders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===y&&d.getMonth()+1===m;});
+  }
   return orders;
 }
 
@@ -410,7 +445,9 @@ function renderStats(){
   const sm=document.getElementById('sMargin');sm.textContent=avg!==null?avg.toFixed(1)+'%':'—';sm.className='stat-card-val '+(avg===null?'c-muted':avg>=0?'c-green':'c-red');
   document.getElementById('orderCount').textContent=filtered.length+'筆';
   const delBtn=document.getElementById('delPeriodBtn');
-  const labels={today:'刪除今天',month:'刪除本月',all:'刪除全部'};
+  const sel2=document.getElementById('monthSelect');
+  const pickLabel2=sel2&&sel2.options[sel2.selectedIndex]?'刪除 '+sel2.options[sel2.selectedIndex].text:'刪除選定月';
+  const labels={today:'刪除今天',month:'刪除本月',pick:pickLabel2,all:'刪除全部'};
   delBtn.style.display=filtered.length?'block':'none';
   delBtn.textContent=labels[curPeriod]||'刪除本期';
   const list=document.getElementById('ordersList');
