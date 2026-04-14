@@ -93,6 +93,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .onum{font-size:12px;font-weight:500}
 .del-btn{background:none;border:none;cursor:pointer;color:var(--mt-hint);font-size:12px;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
 .del-btn:active{background:#F5E0DC;color:var(--mt-red)}
+.del-period-btn{padding:5px 12px;background:none;border:0.5px solid var(--mt-border2);border-radius:20px;font-size:12px;color:var(--mt-red);cursor:pointer;white-space:nowrap}
+.del-period-btn:active{background:#F5E0DC}
 .c-blue{color:var(--mt-blue)}.c-green{color:var(--mt-green)}.c-red{color:var(--mt-red)}.c-muted{color:var(--mt-muted)}
 .apply-row{background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:14px;padding:12px 14px;margin-bottom:12px}
 .apply-label{font-size:11px;color:var(--mt-muted);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:10px}
@@ -210,7 +212,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="divider"></div>
     <div class="list-header">
       <span class="list-title">訂單明細</span>
-      <span class="list-count" id="orderCount"></span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="list-count" id="orderCount"></span>
+        <button class="del-period-btn" id="delPeriodBtn" style="display:none" onclick="deletePeriod()">刪除本期</button>
+      </div>
     </div>
     <div class="orders-list" id="ordersList"></div>
   </div>
@@ -379,6 +384,16 @@ function saveOrder(){
 
 function deleteOrder(id){if(!confirm('確定刪除？'))return;orders=orders.filter(o=>o.id!==id);save();renderStats();}
 
+function deletePeriod(){
+  const filtered=filterOrders();
+  if(!filtered.length)return;
+  const labels={today:'今天',month:'本月',all:'全部'};
+  if(!confirm(`確定刪除「${labels[curPeriod]}」共 ${filtered.length} 筆訂單？此動作無法復原。`))return;
+  const ids=new Set(filtered.map(o=>o.id));
+  orders=orders.filter(o=>!ids.has(o.id));
+  save();renderStats();
+}
+
 function filterOrders(){
   const now=new Date();
   if(curPeriod==='today'){const t=now.toDateString();return orders.filter(o=>new Date(o.date).toDateString()===t);}
@@ -394,6 +409,10 @@ function renderStats(){
   const sp=document.getElementById('sProfit');sp.textContent=fmt(tP);sp.className='stat-card-val '+(tP>=0?'c-green':'c-red');
   const sm=document.getElementById('sMargin');sm.textContent=avg!==null?avg.toFixed(1)+'%':'—';sm.className='stat-card-val '+(avg===null?'c-muted':avg>=0?'c-green':'c-red');
   document.getElementById('orderCount').textContent=filtered.length+'筆';
+  const delBtn=document.getElementById('delPeriodBtn');
+  const labels={today:'刪除今天',month:'刪除本月',all:'刪除全部'};
+  delBtn.style.display=filtered.length?'block':'none';
+  delBtn.textContent=labels[curPeriod]||'刪除本期';
   const list=document.getElementById('ordersList');
   if(!filtered.length){list.innerHTML='<div class="empty-state">此期間尚無訂單記錄</div>';return;}
   list.innerHTML=filtered.map(o=>{const pc=o.profit>=0?'c-green':'c-red';return`<div class="order-row"><div class="order-top"><div><div class="order-note-text">${o.note||'未備註'} <span class="order-level">· ${o.level}</span></div><div class="order-date">${o.dateStr}</div></div><button class="del-btn" onclick="deleteOrder(${o.id})">刪除</button></div><div class="order-items-str">${o.items.map(i=>`${i.name} ×${i.qty}`).join('、')}</div><div class="order-nums"><span class="onum c-blue">營收 ${fmt(o.rev)}</span><span class="onum ${pc}">利潤 ${fmt(o.profit)}</span><span class="onum c-muted">${o.margin.toFixed(1)}%</span></div></div>`;}).join('');
