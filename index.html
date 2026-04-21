@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#8B6F5E">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>LEAD TEAM NO.1</title>
+<title>婕樂纖 點單</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -104,6 +104,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .onum{font-size:12px;font-weight:500}
 .del-btn{background:none;border:none;cursor:pointer;color:var(--mt-hint);font-size:12px;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
 .del-btn:active{background:#F5E0DC;color:var(--mt-red)}
+.receipt-hist-btn{background:none;border:0.5px solid var(--mt-border2);cursor:pointer;color:var(--mt-accent);font-size:12px;padding:3px 10px;border-radius:6px;white-space:nowrap;flex-shrink:0;font-weight:500}
+.receipt-hist-btn:active{background:var(--mt-surface2)}
 .empty-state{text-align:center;padding:3rem 1rem;color:var(--mt-hint);font-size:14px;background:var(--mt-surface);border-radius:16px}
 .month-select-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .month-select{flex:1;padding:8px 12px;border:0.5px solid var(--mt-border2);border-radius:10px;background:var(--mt-card);color:var(--mt-text);font-size:14px;font-weight:500;outline:none}
@@ -725,11 +727,55 @@ function renderStats(){
   document.getElementById('orderCount').textContent=filtered.length+'筆';
   const list=document.getElementById('ordersList');
   if(!filtered.length){list.innerHTML='<div class="empty-state">此期間尚無訂單記錄</div>';renderManualList();return;}
-  list.innerHTML=filtered.map(o=>{const pc=o.profit>=0?'c-green':'c-red';return`<div class="order-row"><div class="order-top"><div><div class="order-note-text">${o.note||'未備註'} <span class="order-level">· ${o.level}</span></div><div class="order-date">${o.dateStr}</div></div><button class="del-btn" onclick="deleteOrder(${o.id})">刪除</button></div><div class="order-items-str">${o.items.map(i=>i.name+' ×'+i.qty).join('、')}</div><div class="order-nums"><span class="onum c-blue">營收 ${fmt(o.rev)}</span><span class="onum ${pc}">利潤 ${fmt(o.profit)}</span><span class="onum c-muted">${o.margin.toFixed(1)}%</span></div></div>`;}).join('');
+  list.innerHTML=filtered.map(o=>{const pc=o.profit>=0?'c-green':'c-red';return`<div class="order-row"><div class="order-top"><div><div class="order-note-text">${o.note||'未備註'} <span class="order-level">· ${o.level}</span></div><div class="order-date">${o.dateStr}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="receipt-hist-btn" onclick="showHistReceipt(${o.id})">單據</button><button class="del-btn" onclick="deleteOrder(${o.id})">刪除</button></div></div><div class="order-items-str">${o.items.map(i=>i.name+' ×'+i.qty).join('、')}</div><div class="order-nums"><span class="onum c-blue">營收 ${fmt(o.rev)}</span><span class="onum ${pc}">利潤 ${fmt(o.profit)}</span><span class="onum c-muted">${o.margin.toFixed(1)}%</span></div></div>`;}).join('');
   renderManualList();
 }
 
 function deleteOrder(id){if(!confirm('確定刪除？'))return;orders=orders.filter(o=>o.id!==id);saveStorage();renderStats();}
+
+function showHistReceipt(id){
+  const o=orders.find(x=>x.id===id);
+  if(!o)return;
+  const rowsHtml=o.items.map(item=>{
+    const isGift=item.name.startsWith('[贈品]');
+    const isBiz=item.name.startsWith('[創業]');
+    const sp=item.qty>0?item.rev/item.qty:0;
+    return`<div class="receipt-item">
+      <div class="receipt-item-name">${item.name.replace('[贈品] ','').replace('[創業] ','')}</div>
+      <div class="receipt-item-origin"></div>
+      <div class="receipt-item-unit" style="color:var(--mt-accent)">${isGift?'贈品':(sp<0?'支出':fmt(sp))}</div>
+      <div class="receipt-item-qty">×${item.qty}</div>
+      <div class="receipt-item-price">${isGift?'贈品':(item.rev<0?'－'+fmt(Math.abs(item.rev)):fmt(item.rev))}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('receiptBody').innerHTML=`
+    <div class="receipt-brand">
+      <div class="receipt-brand-name">婕樂纖 JEROSSE</div>
+      <div class="receipt-brand-sub">健康美麗，從這裡開始</div>
+    </div>
+    ${o.note?`<div class="receipt-customer">客戶：<span>${o.note}</span></div>`:''}
+    <div class="receipt-items">
+      <div style="display:grid;grid-template-columns:minmax(0,2fr) 60px 60px 36px 70px;gap:4px;padding-bottom:8px;border-bottom:0.5px solid var(--mt-border2);margin-bottom:4px">
+        <span style="font-size:11px;color:var(--mt-muted)">商品</span>
+        <span style="font-size:11px;color:var(--mt-muted)"></span>
+        <span style="font-size:11px;color:var(--mt-muted);text-align:right">單價</span>
+        <span style="font-size:11px;color:var(--mt-muted);text-align:center">數量</span>
+        <span style="font-size:11px;color:var(--mt-muted);text-align:right">金額</span>
+      </div>
+      ${rowsHtml}
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:0.5px solid var(--mt-border2);font-size:13px;color:var(--mt-muted)">
+      <span>等級</span><span style="font-weight:500;color:var(--mt-text)">${o.level}</span>
+    </div>
+    <div class="receipt-total">
+      <span class="receipt-total-label">合計</span>
+      <span class="receipt-total-val">${fmt(o.rev)}</span>
+    </div>
+    <div class="receipt-footer">感謝您的購買，祝您使用愉快</div>
+    <div class="receipt-date">${o.dateStr}</div>
+  `;
+  document.getElementById('receiptModal').classList.add('open');
+}
 
 function addManual(){
   const month=document.getElementById('manualMonth').value;
