@@ -9,74 +9,85 @@
 <meta name="theme-color" content="#8B6F5E">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>婕樂纖 利潤計算機</title>
+<title>婕樂纖 點單</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#FAF6F1;color:#2C2420;display:flex;flex-direction:column}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#F5F0EB;color:#2C2420;display:flex;flex-direction:column}
 :root{
-  --mt-card:#FFFFFF;--mt-border:#E8DDD4;--mt-border2:#D4C4B8;
+  --mt-card:#fff;--mt-border:#E8DDD4;--mt-border2:#D4C4B8;
   --mt-text:#2C2420;--mt-muted:#8C7B72;--mt-hint:#B8A89E;
   --mt-surface:#F2EBE4;--mt-surface2:#EDE4DA;--mt-accent:#8B6F5E;
   --mt-green:#4A7C59;--mt-red:#A0453A;--mt-blue:#5E7EA0;
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
-.app-header{background:#FAF6F1;padding:calc(12px + var(--safe-top)) 16px 12px;border-bottom:0.5px solid var(--mt-border);flex-shrink:0}
-.app-title{font-size:17px;font-weight:600;letter-spacing:-0.3px;color:var(--mt-text)}
-.app-subtitle{font-size:12px;color:var(--mt-muted);margin-top:1px}
-.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(16px + var(--safe-bottom))}
-.bottom-nav{display:flex;background:var(--mt-card);border-top:0.5px solid var(--mt-border);padding-bottom:var(--safe-bottom);flex-shrink:0}
-.nav-btn{flex:1;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;border:none;background:none;cursor:pointer;color:var(--mt-hint);font-size:10px;font-weight:500;letter-spacing:0.3px}
-.nav-btn.active{color:var(--mt-accent)}
-.nav-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.page{display:none}.page.active{display:block}
-.toolbar{display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.level-select{padding:7px 10px;border:0.5px solid var(--mt-border2);border-radius:20px;background:var(--mt-card);color:var(--mt-text);font-size:13px;font-weight:500;outline:none;flex:1;min-width:0}
-.btn-group{display:flex;gap:6px;flex-shrink:0}
-.add-btn{padding:7px 11px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
-.outline-btn{padding:7px 11px;background:var(--mt-surface2);color:var(--mt-accent);border:0.5px solid var(--mt-border2);border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
-.items-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
-.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--mt-hint);font-size:14px;background:var(--mt-surface);border-radius:16px;line-height:1.8}
-.card{background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:16px;overflow:hidden}
-.card.custom-card{border-color:var(--mt-border2)}
-.card-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 0}
-.series-tag{font-size:11px;font-weight:500;padding:3px 9px;border-radius:10px;background:var(--mt-surface2);color:var(--mt-accent)}
-.custom-tag{background:#F0E8E0;color:#7A5C48}
-.rm-btn{width:22px;height:22px;border-radius:50%;border:none;background:var(--mt-surface);color:var(--mt-muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.rm-btn:active{background:#F5E0DC;color:var(--mt-red)}
-.card-body{padding:8px 14px 12px;display:flex;flex-direction:column;gap:8px}
-.prod-select{width:100%;padding:7px 10px;border:0.5px solid var(--mt-border);border-radius:10px;background:var(--mt-surface);color:var(--mt-text);font-size:13px;font-weight:500;outline:none}
-.controls{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:8px}
-.custom-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:6px}
-.ctrl-group{display:flex;flex-direction:column;gap:3px}
-.ctrl-label{font-size:11px;color:var(--mt-muted);letter-spacing:0.2px;padding-left:2px}
-.ctrl-select,.ctrl-input,.custom-name-input{padding:7px 10px;border:0.5px solid var(--mt-border);border-radius:10px;background:var(--mt-surface);color:var(--mt-text);font-size:13px;outline:none;width:100%}
-.qty-ctrl{display:flex;align-items:center;border:0.5px solid var(--mt-border);border-radius:10px;background:var(--mt-surface);overflow:hidden;height:36px}
-.qty-btn{width:36px;height:36px;border:none;background:none;color:var(--mt-accent);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
-.qty-btn:active{background:var(--mt-border)}
-.qty-num{flex:1;border:none;background:none;text-align:center;font-size:14px;font-weight:500;color:var(--mt-text);outline:none;min-width:0;padding:0}
-.custom-name-input{border-color:var(--mt-border2);background:#FBF7F4}
-.custom-name-input::placeholder,.ctrl-input::placeholder{color:var(--mt-hint)}
-.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--mt-border);border-top:0.5px solid var(--mt-border)}
-.metric{background:var(--mt-card);padding:10px 6px;text-align:center}
-.metric-label{font-size:9px;color:var(--mt-muted);letter-spacing:0.4px;margin-bottom:4px;text-transform:uppercase}
-.metric-val{font-size:13px;font-weight:500}
-.note-row{margin-bottom:12px}
-.note-input{width:100%;padding:9px 12px;border:0.5px solid var(--mt-border);border-radius:10px;background:var(--mt-card);color:var(--mt-text);font-size:13px;outline:none}
-.note-input::placeholder{color:var(--mt-hint)}
-.totals-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
-.tot{background:var(--mt-surface2);border-radius:12px;padding:12px 8px;text-align:center}
-.tot-label{font-size:10px;color:var(--mt-muted);letter-spacing:0.4px;margin-bottom:5px;text-transform:uppercase}
-.tot-val{font-size:17px;font-weight:500;letter-spacing:-0.3px}
-.save-btn{padding:14px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;width:100%}
+
+/* Header */
+.header{background:#FAF6F1;border-bottom:0.5px solid var(--mt-border);padding:calc(10px + var(--safe-top)) 14px 10px;flex-shrink:0}
+.header-row{display:flex;align-items:center;gap:10px}
+.app-title{font-size:16px;font-weight:600;color:var(--mt-text);flex:1}
+.level-select{padding:6px 12px;border:0.5px solid var(--mt-border2);border-radius:20px;background:var(--mt-card);color:var(--mt-text);font-size:13px;font-weight:500;outline:none}
+.sell-type-select{padding:6px 10px;border:0.5px solid var(--mt-border2);border-radius:20px;background:var(--mt-card);color:var(--mt-text);font-size:12px;outline:none;max-width:130px}
+
+/* Tab bar */
+.tab-bar{display:flex;background:#FAF6F1;border-bottom:0.5px solid var(--mt-border);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-bar::-webkit-scrollbar{display:none}
+.series-tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--mt-muted);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;flex-shrink:0}
+.series-tab.active{color:var(--mt-accent);border-bottom-color:var(--mt-accent)}
+
+/* Grid */
+.grid-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px 0}
+.product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-bottom:12px}
+.prod-btn{background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:14px;padding:14px 12px;cursor:pointer;text-align:left;position:relative;transition:border-color 0.1s;min-height:90px;display:flex;flex-direction:column;justify-content:space-between}
+.prod-btn.has-qty{border-color:var(--mt-accent);background:#FBF8F5}
+.prod-btn:active{opacity:0.85}
+.prod-name{font-size:13px;font-weight:500;color:var(--mt-text);line-height:1.4;margin-bottom:6px}
+.prod-cost{font-size:16px;font-weight:600;color:var(--mt-accent);letter-spacing:-0.3px}
+.prod-cost-label{font-size:10px;color:var(--mt-muted);margin-bottom:2px}
+.qty-badge{position:absolute;top:8px;right:8px;min-width:28px;height:28px;padding:0 6px;background:var(--mt-accent);color:#fff;border-radius:14px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;gap:3px}
+.series-label{font-size:10px;color:var(--mt-hint);margin-bottom:4px;letter-spacing:0.3px;text-transform:uppercase}
+
+/* Bottom bar */
+.bottom-bar{flex-shrink:0;background:#FAF6F1;border-top:0.5px solid var(--mt-border);padding:10px 14px calc(10px + var(--safe-bottom))}
+.bottom-summary{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.summary-nums{flex:1;display:flex;gap:14px}
+.sum-item{display:flex;flex-direction:column}
+.sum-label{font-size:10px;color:var(--mt-muted);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:2px}
+.sum-val{font-size:17px;font-weight:600;letter-spacing:-0.4px}
+.clear-btn{padding:8px 14px;background:var(--mt-surface2);color:var(--mt-muted);border:0.5px solid var(--mt-border2);border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.clear-btn:active{opacity:0.8}
+.bottom-actions{display:flex;gap:8px}
+.note-input-small{flex:1;padding:10px 12px;border:0.5px solid var(--mt-border);border-radius:12px;background:var(--mt-card);color:var(--mt-text);font-size:13px;outline:none}
+.note-input-small::placeholder{color:var(--mt-hint)}
+.save-btn{padding:10px 20px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
 .save-btn:active{opacity:0.85}
+
+/* Cart items overlay */
+.cart-preview{display:none;background:var(--mt-surface);border-radius:12px;padding:8px 10px;margin-bottom:8px;max-height:140px;overflow-y:auto}
+.cart-preview.show{display:block}
+.cart-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mt-text);padding:4px 2px;gap:6px}
+.cart-row-name{color:var(--mt-muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cart-row-ctrl{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.cart-ctrl-btn{width:22px;height:22px;border-radius:50%;border:0.5px solid var(--mt-border2);background:var(--mt-card);color:var(--mt-text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-weight:500}
+.cart-ctrl-btn:active{background:var(--mt-surface2)}
+.cart-row-qty{font-weight:600;color:var(--mt-accent);min-width:20px;text-align:center}
+
+/* Bottom nav */
+.bottom-nav{display:flex;background:var(--mt-card);border-top:0.5px solid var(--mt-border);padding-bottom:var(--safe-bottom);flex-shrink:0}
+.nav-btn{flex:1;padding:10px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--mt-hint);font-size:10px;font-weight:500}
+.nav-btn.active{color:var(--mt-accent)}
+.nav-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.page{display:none}.page.active{display:contents}
+
+/* Stats page */
+.stats-wrap{flex:1;overflow-y:auto;padding:16px 14px calc(16px + var(--safe-bottom))}
 .period-bar{display:flex;gap:2px;background:var(--mt-surface);border-radius:12px;padding:3px;margin-bottom:16px}
 .period-btn{flex:1;padding:7px;text-align:center;font-size:13px;font-weight:500;color:var(--mt-muted);border:none;background:none;border-radius:9px;cursor:pointer}
 .period-btn.active{background:var(--mt-card);color:var(--mt-text);border:0.5px solid var(--mt-border)}
 .stat-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
 .stat-card{background:var(--mt-surface2);border-radius:14px;padding:14px}
 .stat-card-label{font-size:10px;color:var(--mt-muted);letter-spacing:0.4px;margin-bottom:5px;text-transform:uppercase}
-.stat-card-val{font-size:22px;font-weight:500;letter-spacing:-0.5px}
+.stat-card-val{font-size:22px;font-weight:600;letter-spacing:-0.5px}
 .stat-card-sub{font-size:11px;color:var(--mt-muted);margin-top:2px}
 .divider{height:0.5px;background:var(--mt-border);margin:4px 0 14px}
 .list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -93,119 +104,166 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .onum{font-size:12px;font-weight:500}
 .del-btn{background:none;border:none;cursor:pointer;color:var(--mt-hint);font-size:12px;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
 .del-btn:active{background:#F5E0DC;color:var(--mt-red)}
-.del-period-btn{padding:5px 12px;background:none;border:0.5px solid var(--mt-border2);border-radius:20px;font-size:12px;color:var(--mt-red);cursor:pointer;white-space:nowrap}
-.del-period-btn:active{background:#F5E0DC}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--mt-hint);font-size:14px;background:var(--mt-surface);border-radius:16px}
+.month-select-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.month-select{flex:1;padding:8px 12px;border:0.5px solid var(--mt-border2);border-radius:10px;background:var(--mt-card);color:var(--mt-text);font-size:14px;font-weight:500;outline:none}
+.chart-wrap{background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:14px;padding:14px;margin-bottom:16px}
+.chart-title{font-size:11px;color:var(--mt-muted);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:12px}
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:80px}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;min-height:2px;transition:opacity 0.1s}
+.chart-bar.profit{background:var(--mt-green)}
+.chart-bar.loss{background:var(--mt-red)}
+.chart-bar.active{opacity:0.7}
+.chart-bar-label{font-size:9px;color:var(--mt-muted);white-space:nowrap}
+.chart-bar-val{font-size:9px;font-weight:500;color:var(--mt-muted)}
+
 .c-blue{color:var(--mt-blue)}.c-green{color:var(--mt-green)}.c-red{color:var(--mt-red)}.c-muted{color:var(--mt-muted)}
-.apply-row{background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:14px;padding:12px 14px;margin-bottom:12px}
-.apply-label{font-size:11px;color:var(--mt-muted);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:10px}
-.apply-btn-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.apply-grid-btn{padding:9px 4px;border:0.5px solid var(--mt-border2);border-radius:10px;background:var(--mt-surface);color:var(--mt-text);font-size:12px;font-weight:500;cursor:pointer;text-align:center;line-height:1.3;transition:background 0.1s}
-.apply-grid-btn.active{background:var(--mt-accent);color:#FAF6F1;border-color:var(--mt-accent)}
-.apply-grid-btn:active{opacity:0.85}
-.apply-grid-sub{font-size:10px;color:var(--mt-muted);margin-top:2px}
-.apply-grid-btn.active .apply-grid-sub{color:rgba(255,255,255,0.7)}
-.install-banner{background:var(--mt-surface2);border:0.5px solid var(--mt-border2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.install-text{font-size:13px}.install-sub{font-size:11px;color:var(--mt-muted);margin-top:2px}
-.install-close{background:none;border:none;cursor:pointer;color:var(--mt-muted);font-size:16px;padding:4px}
-/* Modal */
-.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(44,36,32,0.55);z-index:100;align-items:flex-end}
-.modal-backdrop.open{display:flex}
-.modal{background:#FAF6F1;border-radius:24px 24px 0 0;padding:20px 20px calc(20px + var(--safe-bottom));width:100%;max-height:88vh;overflow-y:auto}
-.modal-handle{width:36px;height:4px;background:var(--mt-border2);border-radius:2px;margin:0 auto 16px}
-.modal-title{font-size:17px;font-weight:600;margin-bottom:4px}
-.modal-sub{font-size:13px;color:var(--mt-muted);margin-bottom:16px}
-.drop-zone{border:1.5px dashed var(--mt-border2);border-radius:14px;padding:24px 20px;text-align:center;cursor:pointer;background:var(--mt-surface);margin-bottom:12px}
-.drop-icon{font-size:28px;margin-bottom:6px}
-.drop-text{font-size:14px;color:var(--mt-muted)}
-.drop-sub{font-size:12px;color:var(--mt-hint);margin-top:4px}
-#previewImg{width:100%;max-height:160px;object-fit:contain;border-radius:10px;margin-bottom:12px;display:none}
-.ai-loading{display:none;align-items:center;justify-content:center;gap:10px;padding:14px;font-size:13px;color:var(--mt-muted)}
-.spin{width:18px;height:18px;border:2px solid var(--mt-border2);border-top-color:var(--mt-accent);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ai-result{display:none;background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:12px;padding:12px 14px;margin-bottom:12px}
-.ai-result-label{font-size:10px;color:var(--mt-muted);letter-spacing:0.4px;text-transform:uppercase;margin-bottom:8px}
-.ai-item-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--mt-border)}
-.ai-item-row:last-child{border-bottom:none}
-.ai-item-name{font-size:13px}
-.ai-item-right{text-align:right}
-.ai-item-qty{font-size:14px;font-weight:500;color:var(--mt-accent)}
-.ai-item-price{font-size:11px;color:var(--mt-muted)}
-.apply-btn{width:100%;padding:13px;background:#4A7C59;color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px}
-.apply-btn:active{opacity:0.85}
-.cancel-btn{width:100%;padding:12px;background:var(--mt-surface2);color:var(--mt-muted);border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer}
-.ai-error{display:none;background:#FEF0EF;border:0.5px solid #F5C5C2;border-radius:10px;padding:10px 14px;font-size:13px;color:var(--mt-red);margin-bottom:12px;line-height:1.6}
+.gift-btn{border-color:#C8A882;background:#FBF5EE}
+.gift-btn.has-qty{border-color:#8B6F5E;background:#F5EBE0}
+.gift-btn .prod-cost{color:#8B6F5E}
+.biz-btn{border-color:#A8C8B8;background:#F0F7F4}
+.biz-btn.has-qty{border-color:#4A7C59;background:#E8F4EE}
+.biz-btn .prod-cost{color:#4A7C59;font-size:18px}
+.expense-btn{border-color:#F0A0A0!important;background:#FEF5F5!important}
+.expense-btn.has-qty{border-color:#A32D2D!important;background:#FDEAEA!important}
+.expense-btn .prod-cost{color:#A32D2D!important}
+.manual-wrap{background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:14px;padding:14px;margin-bottom:16px}
+.manual-title{font-size:11px;color:var(--mt-muted);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:10px}
+.manual-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center;margin-bottom:8px}
+.manual-input{padding:8px 10px;border:0.5px solid var(--mt-border);border-radius:10px;background:var(--mt-surface);color:var(--mt-text);font-size:13px;outline:none;width:100%}
+.manual-input::placeholder{color:var(--mt-hint)}
+.manual-add-btn{padding:8px 14px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.manual-add-btn:active{opacity:0.85}
+.manual-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.manual-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--mt-surface);border-radius:8px;font-size:13px}
+.manual-item-left{color:var(--mt-muted)}
+.manual-item-right{font-weight:500}
+.manual-del{background:none;border:none;cursor:pointer;color:var(--mt-hint);font-size:12px;padding:2px 6px;border-radius:6px}
+.manual-del:active{color:var(--mt-red)}
+.stats-tab-bar{display:flex;gap:2px;background:var(--mt-surface);border-radius:12px;padding:3px;margin-bottom:14px}
+.stats-tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--mt-muted);border:none;background:none;border-radius:9px;cursor:pointer}
+.stats-tab.active{background:var(--mt-card);color:var(--mt-text);border:0.5px solid var(--mt-border)}
+.prod-stats-header{display:grid;grid-template-columns:minmax(0,3fr) 60px 80px;gap:4px;padding:6px 10px;font-size:11px;color:var(--mt-muted);letter-spacing:0.3px;text-transform:uppercase;border-bottom:0.5px solid var(--mt-border);margin-bottom:4px}
+.prod-stat-row{display:grid;grid-template-columns:minmax(0,3fr) 60px 80px;gap:4px;padding:10px 10px;font-size:13px;border-bottom:0.5px solid var(--mt-border);align-items:center}
+.prod-stat-row:last-child{border-bottom:none}
+.prod-stat-name{color:var(--mt-text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prod-stat-qty{color:var(--mt-accent);font-weight:600;text-align:center}
+.prod-stat-rev{color:var(--mt-blue);font-weight:500;text-align:right;font-size:12px}
+
+/* 客戶單據 */
+.receipt-backdrop{display:none;position:fixed;inset:0;background:rgba(44,36,32,0.6);z-index:200;align-items:flex-end;justify-content:center}
+.receipt-backdrop.open{display:flex}
+.receipt-sheet{background:#FAF6F1;border-radius:24px 24px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 20px calc(24px + var(--safe-bottom))}
+.receipt-handle{width:36px;height:4px;background:var(--mt-border2);border-radius:2px;margin:0 auto 20px}
+.receipt-body{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px}
+.receipt-brand{text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:0.5px dashed var(--mt-border2)}
+.receipt-brand-name{font-size:18px;font-weight:600;color:var(--mt-text);letter-spacing:-0.3px}
+.receipt-brand-sub{font-size:12px;color:var(--mt-muted);margin-top:3px}
+.receipt-customer{font-size:13px;color:var(--mt-muted);margin-bottom:16px;padding-bottom:12px;border-bottom:0.5px dashed var(--mt-border2)}
+.receipt-customer span{color:var(--mt-text);font-weight:500}
+.receipt-items{margin-bottom:16px}
+.receipt-item{display:grid;grid-template-columns:minmax(0,2fr) 60px 60px 36px 70px;gap:4px;padding:9px 0;border-bottom:0.5px solid #F2EBE4;align-items:center}
+.receipt-item:last-child{border-bottom:none}
+.receipt-item-name{font-size:13px;color:var(--mt-text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.receipt-item-origin{font-size:12px;color:var(--mt-hint);text-align:right}
+.receipt-item-unit{font-size:12px;text-align:right;font-weight:500}
+.receipt-item-qty{font-size:13px;color:var(--mt-muted);text-align:center}
+.receipt-item-price{font-size:13px;color:var(--mt-text);text-align:right;font-weight:500}
+.receipt-total{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1.5px solid var(--mt-text);margin-top:8px}
+.receipt-total-label{font-size:15px;font-weight:600;color:var(--mt-text)}
+.receipt-total-val{font-size:20px;font-weight:700;color:var(--mt-accent);letter-spacing:-0.5px}
+.receipt-footer{text-align:center;font-size:11px;color:var(--mt-hint);margin-top:14px;padding-top:12px;border-top:0.5px dashed var(--mt-border2)}
+.receipt-date{font-size:12px;color:var(--mt-muted);text-align:center;margin-top:4px}
+.receipt-actions{display:flex;gap:8px}
+.receipt-close-btn{flex:1;padding:13px;background:var(--mt-surface2);color:var(--mt-muted);border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer}
+.preview-btn{padding:10px 16px;background:var(--mt-surface2);color:var(--mt-accent);border:0.5px solid var(--mt-border2);border-radius:12px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.preview-btn:active{opacity:0.85}
 </style>
 </head>
 <body>
 
-<div class="app-header">
-  <div class="app-title">婕樂纖 利潤計算機</div>
-  <div class="app-subtitle">纖體保健 · 美肌系列</div>
-</div>
+<!-- POS Page -->
+<div id="page-pos" class="page active" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
 
-<div class="scroll-area" id="scrollArea">
-  <div class="install-banner" id="installBanner" style="display:none">
-    <div>
-      <div class="install-text">加到手機桌面</div>
-      <div class="install-sub">iOS：分享 → 加入主畫面 ｜ Android：選單 → 安裝</div>
-    </div>
-    <button class="install-close" onclick="document.getElementById('installBanner').style.display='none'">✕</button>
-  </div>
-
-  <div id="page-calc" class="page active">
-    <div class="toolbar">
-      <select class="level-select" id="myLevel" onchange="renderItems()">
-        <option value="皇家輔導">皇家輔導</option>
-        <option value="一級輔導">一級輔導</option>
+  <div class="header">
+    <div class="header-row">
+      <span class="app-title">婕樂纖</span>
+      <select class="level-select" id="myLevel" onchange="renderGrid()">
         <option value="二級輔導">二級輔導</option>
         <option value="三級輔導">三級輔導</option>
         <option value="三級零售">三級零售</option>
         <option value="實習" selected>實習</option>
       </select>
-      <div class="btn-group">
-        <button class="outline-btn" onclick="addCustom()">＋ 自訂</button>
-        <button class="add-btn" onclick="addItem()">＋ 品牌</button>
-      </div>
+      <select class="sell-type-select" id="sellType" onchange="renderGrid()">
+        <option value="r0">售：零售價</option>
+        <option value="r1">售：任兩盒</option>
+        <option value="r2">售：VIP價</option>
+        <option disabled>── 售：進貨價 ──</option>
+        <option value="c_一級輔導">售：一級進貨</option>
+        <option value="c_二級輔導">售：二級進貨</option>
+        <option value="c_三級輔導">售：三級輔進貨</option>
+        <option value="c_三級零售">售：三級零進貨</option>
+        <option value="c_實習">售：實習進貨</option>
+      </select>
     </div>
-    <div class="apply-row" id="applyRow">
-      <div class="apply-label">全部套用售價類型</div>
-      <div class="apply-btn-grid">
-        <button class="apply-grid-btn active" id="applyGridBtn-r0" onclick="applyAllPriceType('r0')">零售價<div class="apply-grid-sub">消費者</div></button>
-        <button class="apply-grid-btn" id="applyGridBtn-r1" onclick="applyAllPriceType('r1')">任兩盒<div class="apply-grid-sub">優惠價</div></button>
-        <button class="apply-grid-btn" id="applyGridBtn-r2" onclick="applyAllPriceType('r2')">VIP<div class="apply-grid-sub">混品價</div></button>
-        <button class="apply-grid-btn" id="applyGridBtn-c_一級輔導" onclick="applyAllPriceType('c_一級輔導')">一級<div class="apply-grid-sub">進貨價</div></button>
-        <button class="apply-grid-btn" id="applyGridBtn-c_二級輔導" onclick="applyAllPriceType('c_二級輔導')">二級<div class="apply-grid-sub">進貨價</div></button>
-        <button class="apply-grid-btn" id="applyGridBtn-c_三級輔導" onclick="applyAllPriceType('c_三級輔導')">三級輔<div class="apply-grid-sub">進貨價</div></button>
-        <button class="apply-grid-btn" id="applyGridBtn-c_三級零售" onclick="applyAllPriceType('c_三級零售')">三級零<div class="apply-grid-sub">進貨價</div></button>
-        <button class="apply-grid-btn" id="applyGridBtn-c_實習" onclick="applyAllPriceType('c_實習')">實習<div class="apply-grid-sub">進貨價</div></button>
-      </div>
-    </div>
-    <div class="items-wrap" id="items">
-      <div class="empty-state">點上方按鈕新增商品開始計算</div>
-    </div>
-    <div class="note-row">
-      <div class="ctrl-group">
-        <span class="ctrl-label">備註（選填，如：客戶名稱）</span>
-        <input class="note-input" id="orderNote" type="text" placeholder="例：王小明">
-      </div>
-    </div>
-    <div class="totals-bar">
-      <div class="tot"><div class="tot-label">總營收</div><div class="tot-val c-blue" id="tRev">NT$0</div></div>
-      <div class="tot"><div class="tot-label">總利潤</div><div class="tot-val" id="tProfit">NT$0</div></div>
-      <div class="tot"><div class="tot-label">利潤率</div><div class="tot-val" id="tMargin">—</div></div>
-    </div>
-    <button class="save-btn" onclick="saveOrder()">儲存訂單</button>
   </div>
 
-  <div id="page-stats" class="page">
+  <div class="tab-bar" id="tabBar"></div>
+
+  <div class="grid-area">
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="cart-preview" id="cartPreview"></div>
+    <div class="bottom-summary">
+      <div class="summary-nums">
+        <div class="sum-item">
+          <span class="sum-label">營收</span>
+          <span class="sum-val c-blue" id="sumRev">NT$0</span>
+        </div>
+        <div class="sum-item">
+          <span class="sum-label">利潤</span>
+          <span class="sum-val" id="sumProfit">NT$0</span>
+        </div>
+        <div class="sum-item">
+          <span class="sum-label">利潤率</span>
+          <span class="sum-val" id="sumMargin">—</span>
+        </div>
+      </div>
+      <button class="clear-btn" onclick="clearCart()">清空</button>
+    </div>
+    <div class="bottom-actions">
+      <input class="note-input-small" id="orderNote" type="text" placeholder="備註（客戶名稱）">
+      <button class="preview-btn" onclick="previewReceipt()">單據</button>
+      <button class="save-btn" onclick="saveOrder()">儲存訂單</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Page -->
+<div id="page-stats" class="page" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+  <div class="stats-wrap">
+    <div class="stats-tab-bar">
+      <button class="stats-tab active" id="stab-overview" onclick="switchStatsTab('overview')">總覽</button>
+      <button class="stats-tab" id="stab-products" onclick="switchStatsTab('products')">商品統計</button>
+    </div>
+
+    <div id="stats-overview">
     <div class="period-bar">
       <button class="period-btn" onclick="setPeriod('today')">今天</button>
       <button class="period-btn active" onclick="setPeriod('month')">本月</button>
       <button class="period-btn" onclick="setPeriod('pick')">選月份</button>
       <button class="period-btn" onclick="setPeriod('all')">全部</button>
     </div>
-    <div id="monthPicker" style="display:none;margin-bottom:12px">
-      <select id="monthSelect" onchange="renderStats()" style="width:100%;padding:8px 12px;border:0.5px solid var(--mt-border2);border-radius:10px;background:var(--mt-card);color:var(--mt-text);font-size:14px;font-weight:500;outline:none"></select>
+    <div class="month-select-row" id="monthSelectRow" style="display:none">
+      <select class="month-select" id="monthSelect" onchange="renderStats()">
+      </select>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">近12個月淨利潤</div>
+      <div class="chart-bars" id="chartBars"></div>
     </div>
     <div class="stat-cards">
       <div class="stat-card"><div class="stat-card-label">訂單數</div><div class="stat-card-val" id="sOrders">0</div><div class="stat-card-sub">筆</div></div>
@@ -214,21 +272,59 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div class="stat-card"><div class="stat-card-label">平均利潤率</div><div class="stat-card-val" id="sMargin">—</div><div class="stat-card-sub">加權平均</div></div>
     </div>
     <div class="divider"></div>
+    <div class="manual-wrap">
+      <div class="manual-title">手動補登淨利（每次新增會累加）</div>
+      <div class="manual-row">
+        <input class="manual-input" id="manualMonth" type="month" style="font-size:13px">
+        <input class="manual-input" id="manualProfit" type="number" placeholder="淨利金額">
+        <button class="manual-add-btn" onclick="addManual()">新增</button>
+      </div>
+      <div class="manual-list" id="manualList"></div>
+    </div>
+    <div class="divider"></div>
     <div class="list-header">
       <span class="list-title">訂單明細</span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="list-count" id="orderCount"></span>
-        <button class="del-period-btn" id="delPeriodBtn" style="display:none" onclick="deletePeriod()">刪除本期</button>
-      </div>
+      <span class="list-count" id="orderCount"></span>
     </div>
     <div class="orders-list" id="ordersList"></div>
+    </div><!-- end stats-overview -->
+
+    <div id="stats-products" style="display:none">
+      <div class="period-bar">
+        <button class="period-btn" onclick="setProdPeriod('today')">今天</button>
+        <button class="period-btn active" onclick="setProdPeriod('month')">本月</button>
+        <button class="period-btn" onclick="setProdPeriod('pick')">選月份</button>
+        <button class="period-btn" onclick="setProdPeriod('all')">全部</button>
+      </div>
+      <div class="month-select-row" id="prodMonthSelectRow" style="display:none">
+        <select class="month-select" id="prodMonthSelect" onchange="renderProductStats()"></select>
+      </div>
+      <div class="prod-stats-header">
+        <span>商品</span>
+        <span>數量</span>
+        <span>金額</span>
+      </div>
+      <div id="prodStatsList"></div>
+    </div>
   </div>
 </div>
 
+<!-- Receipt Modal -->
+<div class="receipt-backdrop" id="receiptModal">
+  <div class="receipt-sheet">
+    <div class="receipt-handle"></div>
+    <div class="receipt-body" id="receiptBody"></div>
+    <div class="receipt-actions">
+      <button class="receipt-close-btn" onclick="closeReceipt()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom nav -->
 <div class="bottom-nav">
-  <button class="nav-btn active" id="nav-calc" onclick="switchTab('calc')">
-    <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="12" y2="15"/></svg></div>
-    計算
+  <button class="nav-btn active" id="nav-pos" onclick="switchTab('pos')">
+    <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+    點單
   </button>
   <button class="nav-btn" id="nav-stats" onclick="switchTab('stats')">
     <div class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
@@ -236,9 +332,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   </button>
 </div>
 
-
 <script>
-
 const ALL=[
   {name:"纖纖飲",s:"纖體保健",costs:{皇家輔導:700,一級輔導:790,二級輔導:880,三級輔導:955,三級零售:990,實習:1160},retail:[1480,1380,1280]},
   {name:"纖飄錠",s:"纖體保健",costs:{皇家輔導:700,一級輔導:790,二級輔導:880,三級輔導:955,三級零售:990,實習:1160},retail:[1480,1380,1280]},
@@ -249,7 +343,7 @@ const ALL=[
   {name:"肽纖飲(可可/奶茶)",s:"纖體保健",costs:{皇家輔導:440,一級輔導:510,二級輔導:580,三級輔導:635,三級零售:660,實習:780},retail:[990,900,830]},
   {name:"紫纖飲",s:"纖體保健",costs:{皇家輔導:440,一級輔導:510,二級輔導:580,三級輔導:635,三級零售:660,實習:780},retail:[990,900,830]},
   {name:"葉黃素EX飲",s:"纖體保健",costs:{皇家輔導:500,一級輔導:570,二級輔導:640,三級輔導:695,三級零售:720,實習:840},retail:[1080,990,900]},
-  {name:"葉黃素品亮凍",s:"纖體保健",costs:{皇家輔導:320,一級輔導:365,二級輔導:410,三級輔導:440,三級零售:455,實習:530},retail:[680,630,600]},
+  {name:"葉黃素晶亮凍",s:"纖體保健",costs:{皇家輔導:320,一級輔導:365,二級輔導:410,三級輔導:440,三級零售:455,實習:530},retail:[680,630,600]},
   {name:"益生菌",s:"纖體保健",costs:{皇家輔導:620,一級輔導:690,二級輔導:770,三級輔導:830,三級零售:860,實習:990},retail:[1280,1180,1100]},
   {name:"9國",s:"纖體保健",costs:{皇家輔導:320,一級輔導:365,二級輔導:410,三級輔導:440,三級零售:455,實習:530},retail:[680,630,600]},
   {name:"正冠茶",s:"纖體保健",costs:{皇家輔導:440,一級輔導:510,二級輔導:580,三級輔導:635,三級零售:660,實習:780},retail:[990,900,830]},
@@ -265,162 +359,217 @@ const ALL=[
   {name:"法樂蓬洗髮露500ml",s:"美肌",costs:{皇家輔導:620,一級輔導:690,二級輔導:770,三級輔導:830,三級零售:860,實習:990},retail:[1280,1180,1100]},
   {name:"法樂蓬洗髮露體驗包8ml",s:"美肌",costs:{皇家輔導:12,一級輔導:14,二級輔導:17,三級輔導:20,三級零售:21,實習:24},retail:[30,null,null]},
   {name:"法樂蓬養髮原液(30ml)",s:"美肌",costs:{皇家輔導:500,一級輔導:570,二級輔導:640,三級輔導:695,三級零售:720,實習:840},retail:[1080,990,900]},
+  {name:"返利 10,000",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-10000,-10000,-10000],fixed:-10000},
+  {name:"返利 1,000",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-1000,-1000,-1000],fixed:-1000},
+  {name:"返利 100",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-100,-100,-100],fixed:-100},
+  {name:"返利 10",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-10,-10,-10],fixed:-10},
+  {name:"運費",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-70,-70,-70],fixed:-70},
+  {name:"超商運費",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-60,-60,-60],fixed:-60},
+  {name:"全產品手冊",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-12,-12,-12],fixed:-12},
+  {name:"纖體班DM",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-12,-12,-12],fixed:-12},
+  {name:"郭雪芙紙袋",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-20,-20,-20],fixed:-20},
+  {name:"絲巾環保袋",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-120,-120,-120],fixed:-120},
+  {name:"Q版環保袋",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-100,-100,-100],fixed:-100},
+  {name:"事業手冊",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-200,-200,-200],fixed:-200},
 ];
 
-const PRICE_LABELS=["消費者零售價","任兩盒優惠價","混品VIP價"];
-const COST_LEVELS=[{k:'一級輔導',l:'一級輔導價'},{k:'二級輔導',l:'二級輔導價'},{k:'三級輔導',l:'三級輔導價'},{k:'三級零售',l:'三級零售價'},{k:'實習',l:'實習價'}];
-
-let items=[],nid=1,curPeriod='month';
+const SERIES=[...new Set(ALL.filter(p=>p.s!=='創業').map(p=>p.s)),'創業','贈品'];
+let curSeries=SERIES[0];
+let cart={};
+let curPeriod='month';
 let orders=JSON.parse(localStorage.getItem('jerosse-orders')||'[]');
-function save(){localStorage.setItem('jerosse-orders',JSON.stringify(orders));}
+function saveStorage(){localStorage.setItem('jerosse-orders',JSON.stringify(orders));}
 
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
-const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
-if(!isStandalone&&/iPhone|iPad|Android/i.test(navigator.userAgent)) document.getElementById('installBanner').style.display='flex';
+
+function getLevel(){return document.getElementById('myLevel').value;}
+function getSellType(){return document.getElementById('sellType').value;}
+
+function isGift(p){return p&&p.s==='贈品';}
+function getSellPrice(p,pt){
+  if(isGift(p))return 0;
+  if(pt.startsWith('c_')){return p.costs[pt.slice(2)]||0;}
+  const idx=parseInt(pt.replace('r',''));
+  let sp=p.retail[isNaN(idx)?0:idx];
+  if(sp==null)sp=p.retail[0];
+  return sp||0;
+}
+
+function fmt(n){return'NT$'+Math.round(n).toLocaleString();}
+
+// Tab bar
+function renderTabs(){
+  const bar=document.getElementById('tabBar');
+  bar.innerHTML=SERIES.map(s=>`<button class="series-tab${s===curSeries?' active':''}" onclick="selectSeries('${s}')">${s}</button>`).join('');
+}
+
+function selectSeries(s){
+  curSeries=s;
+  renderTabs();
+  renderGrid();
+}
+
+function renderGrid(){
+  const lv=getLevel(),pt=getSellType();
+  const isGiftTab=curSeries==='贈品';
+  const isBizTab=curSeries==='創業';
+  const filtered=isGiftTab
+    ?ALL.filter(p=>p.s!=='創業'&&p.s!=='贈品').map(p=>({...p,s:'贈品',_orig:p}))
+    :ALL.filter(p=>p.s===curSeries);
+  const grid=document.getElementById('productGrid');
+  grid.innerHTML=filtered.map((p)=>{
+    const origP=p._orig||p;
+    const cost=isGiftTab?0:(isBizTab?0:(origP.costs[lv]||0));
+    const sp=isGiftTab?0:(isBizTab?(origP.fixed||origP.retail[0]||0):getSellPrice(origP,pt));
+    const cartKey=isGiftTab?('贈品_'+origP.name):(isBizTab?('創業_'+origP.name):origP.name);
+    const qty=cart[cartKey]||0;
+    const ai=ALL.indexOf(origP);
+    const btnClass=isGiftTab?'gift-btn':(isBizTab?(sp<0?'biz-btn expense-btn':'biz-btn'):'');
+    const seriesLabel=isGiftTab?'贈品':(isBizTab?'創業':p.s);
+    const costLabel=isGiftTab?'贈品':(isBizTab?'固定金額':('我的進貨 NT$'+cost));
+    const priceLabel=isGiftTab?'NT$0':(sp<0?'支出 NT$'+Math.abs(sp):'售價 NT$'+sp);
+    return`<button class="prod-btn${qty>0?' has-qty':''} ${btnClass}" onclick="addToCartByKey(${ai},'${cartKey}')" >
+      ${qty>0?`<div class="qty-badge" onclick="event.stopPropagation();removeFromCartByKey('${cartKey}')">－${qty}</div>`:''}
+      <div>
+        <div class="series-label">${seriesLabel}</div>
+        <div class="prod-name">${origP.name}</div>
+      </div>
+      <div>
+        <div class="prod-cost-label">${costLabel}</div>
+        <div class="prod-cost">${priceLabel}</div>
+      </div>
+    </button>`;
+  }).join('');
+  updateSummary();
+}
+
+function addToCart(idx){
+  const p=ALL[idx];
+  cart[p.name]=(cart[p.name]||0)+1;
+  renderGrid();renderCartPreview();
+}
+function addToCartByKey(idx,key){
+  cart[key]=(cart[key]||0)+1;
+  renderGrid();renderCartPreview();
+}
+function removeFromCart(e,idx){
+  if(e&&e.preventDefault)e.preventDefault();
+  const p=ALL[idx];
+  if(cart[p.name]>0){cart[p.name]--;if(cart[p.name]===0)delete cart[p.name];}
+  renderGrid();renderCartPreview();
+}
+function removeFromCartByKey(key){
+  if(cart[key]>0){cart[key]--;if(cart[key]===0)delete cart[key];}
+  renderGrid();renderCartPreview();
+}
+
+function clearCart(){
+  cart={};
+  document.getElementById('orderNote').value='';
+  renderGrid();
+  renderCartPreview();
+}
+
+function renderCartPreview(){
+  const preview=document.getElementById('cartPreview');
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  if(!items.length){preview.classList.remove('show');return;}
+  preview.classList.add('show');
+  preview.innerHTML=items.map(([key,qty])=>{
+    const isGiftKey=key.startsWith('贈品_');
+    const isBizKey=key.startsWith('創業_');
+    const label=isGiftKey?'[贈品] '+key.slice(3):(isBizKey?'[創業] '+key.slice(3):key);
+    const safeKey=key.replace(/'/g,"\\'");
+    return`<div class="cart-row">
+      <span class="cart-row-name">${label}</span>
+      <div class="cart-row-ctrl">
+        <button class="cart-ctrl-btn" onclick="removeFromCartByKey('${safeKey}')">－</button>
+        <span class="cart-row-qty">${qty}</span>
+        <button class="cart-ctrl-btn" onclick="cart['${safeKey}']=(cart['${safeKey}']||0)+1;renderGrid();renderCartPreview()">＋</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateSummary(){
+  const lv=getLevel(),pt=getSellType();
+  let tR=0,tP=0;
+  Object.entries(cart).forEach(([key,qty])=>{
+    if(qty<=0)return;
+    const isGiftKey=key.startsWith('贈品_');
+    const isBizKey=key.startsWith('創業_');
+    const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
+    const p=ALL.find(x=>x.name===name);if(!p)return;
+    const cost=isGiftKey||isBizKey?0:(p.costs[lv]||0);
+    const sp=isGiftKey?0:(isBizKey?(p.fixed||p.retail[0]||0):getSellPrice(p,pt));
+    tR+=sp*qty;tP+=(sp-cost)*qty;
+  });
+  const avg=tR>0?tP/tR*100:null;
+  document.getElementById('sumRev').textContent=fmt(tR);
+  const pe=document.getElementById('sumProfit');
+  pe.textContent=fmt(tP);pe.className='sum-val '+(tP>=0?'c-green':'c-red');
+  const me=document.getElementById('sumMargin');
+  me.textContent=avg!==null?avg.toFixed(1)+'%':'—';
+  me.className='sum-val '+(avg===null?'c-muted':avg>=0?'c-green':'c-red');
+}
+
+function saveOrder(){
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  if(!items.length){alert('請先選擇商品');return;}
+  const lv=getLevel(),pt=getSellType();
+  const note=document.getElementById('orderNote').value.trim();
+  let tR=0,tP=0;
+  const orderItems=items.map(([key,qty])=>{
+    const isGiftKey=key.startsWith('贈品_');
+    const isBizKey=key.startsWith('創業_');
+    const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
+    const displayName=isGiftKey?'[贈品] '+name:(isBizKey?'[創業] '+name:name);
+    const p=ALL.find(x=>x.name===name);
+    const cost=isGiftKey||isBizKey?0:(p?p.costs[lv]||0:0);
+    const sp=isGiftKey?0:(isBizKey?(p?p.fixed||p.retail[0]||0:0):(p?getSellPrice(p,pt):0));
+    const rev=sp*qty,profit=(sp-cost)*qty;
+    tR+=rev;tP+=profit;
+    return{name:displayName,qty,rev,profit,cost};
+  });
+  const now=new Date();
+  const sellTypeVal=document.getElementById('sellType').value;
+  const sellTypeText=document.getElementById('sellType').selectedOptions[0].text.replace('售：','');
+  orders.unshift({
+    id:Date.now(),date:now.toISOString(),
+    dateStr:now.toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    level:lv,note,sellType:sellTypeText,items:orderItems,rev:tR,profit:tP,margin:tR>0?tP/tR*100:0
+  });
+  saveStorage();
+  clearCart();
+  alert('訂單已儲存！');
+}
 
 function switchTab(t){
-  ['calc','stats'].forEach(id=>{
-    document.getElementById('page-'+id).classList.toggle('active',id===t);
+  ['pos','stats'].forEach(id=>{
+    const pg=document.getElementById('page-'+id);
+    pg.style.display=id===t?'flex':'none';
     document.getElementById('nav-'+id).classList.toggle('active',id===t);
   });
-  document.getElementById('scrollArea').scrollTop=0;
-  if(t==='stats') renderStats();
+  if(t==='stats')renderStats();
 }
+
 function setPeriod(p){
   curPeriod=p;
   document.querySelectorAll('.period-btn').forEach((b,i)=>b.classList.toggle('active',['today','month','pick','all'][i]===p));
-  const picker=document.getElementById('monthPicker');
-  if(p==='pick'){
-    picker.style.display='block';
-    populateMonthSelect();
-  } else {
-    picker.style.display='none';
-  }
+  const pickRow=document.getElementById('monthSelectRow');
+  pickRow.style.display=p==='pick'?'flex':'none';
+  if(p==='pick') populateMonthSelect();
   renderStats();
 }
 
 function populateMonthSelect(){
   const sel=document.getElementById('monthSelect');
-  const months={};
-  orders.forEach(o=>{
-    const d=new Date(o.date);
-    const key=d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');
-    months[key]=true;
-  });
-  const sorted=Object.keys(months).sort().reverse();
-  if(!sorted.length){sel.innerHTML='<option>尚無記錄</option>';return;}
-  sel.innerHTML=sorted.map(k=>{
-    const [y,m]=k.split('-');
-    return`<option value="${k}">${y} 年 ${parseInt(m)} 月</option>`;
-  }).join('');
-}
-function addItem(){items.push({id:nid++,type:'preset',pi:0,pt:'r0',qty:1});renderItems();}
-function addCustom(){items.push({id:nid++,type:'custom',name:'',cost:'',price:'',qty:1});renderItems();}
-function removeItem(id){items=items.filter(i=>i.id!==id);renderItems();}
-function setField(id,f,v){
-  const it=items.find(i=>i.id===id);if(!it)return;
-  if(f==='qty')it[f]=parseInt(v)||1;
-  else if(f==='pi')it[f]=parseInt(v)||0;
-  else it[f]=v;
-  renderItems();
-}
-function getLevel(){return document.getElementById('myLevel').value;}
-function calcPreset(it){
-  const p=ALL[it.pi],lv=getLevel(),cost=p.costs[lv]||0;
-  let sp;const pt=String(it.pt||'r0');
-  if(pt.startsWith('c_')){sp=p.costs[pt.slice(2)]||0;}
-  else{const idx=parseInt(pt.replace('r',''));sp=p.retail[isNaN(idx)?0:idx];if(sp==null)sp=p.retail[0];}
-  const rev=sp*it.qty,tc=cost*it.qty,profit=rev-tc;
-  return{cost,sp,rev,profit,margin:rev>0?profit/rev*100:0,name:p.name};
-}
-function calcCustom(it){
-  const cost=parseFloat(it.cost)||0,sp=parseFloat(it.price)||0;
-  const rev=sp*it.qty,tc=cost*it.qty,profit=rev-tc;
-  return{cost,sp,rev,profit,margin:rev>0?profit/rev*100:0,name:it.name||'自訂商品'};
-}
-function calcItem(it){return it.type==='custom'?calcCustom(it):calcPreset(it);}
-function fmt(n){return'NT$'+Math.round(n).toLocaleString();}
-
-function renderItems(){
-  const wrap=document.getElementById('items');
-  document.getElementById('applyRow').style.display=items.length?'flex':'none';
-  if(!items.length){wrap.innerHTML='<div class="empty-state">點上方按鈕新增商品開始計算</div>';updateTotals();return;}
-  wrap.innerHTML=items.map(it=>{
-    if(it.type==='custom'){
-      const r=calcCustom(it),pc=r.profit>=0?'c-green':'c-red',mc=r.margin>=0?'c-green':'c-red';
-      return`<div class="card custom-card">
-        <div class="card-head"><span class="series-tag custom-tag">自訂商品</span><button class="rm-btn" onclick="removeItem(${it.id})">✕</button></div>
-        <div class="card-body">
-          <div class="custom-row">
-            <div class="ctrl-group"><span class="ctrl-label">名稱</span><input class="custom-name-input" type="text" placeholder="商品名稱" value="${it.name}" oninput="setField(${it.id},'name',this.value)"></div>
-            <div class="ctrl-group"><span class="ctrl-label">成本</span><input class="ctrl-input" type="number" min="0" placeholder="0" value="${it.cost}" oninput="setField(${it.id},'cost',this.value)"></div>
-            <div class="ctrl-group"><span class="ctrl-label">售價</span><input class="ctrl-input" type="number" min="0" placeholder="0" value="${it.price}" oninput="setField(${it.id},'price',this.value)"></div>
-            <div class="ctrl-group"><span class="ctrl-label">數量</span><div class="qty-ctrl"><button class="qty-btn" onclick="setField(${it.id},'qty',${Math.max(1,(it.qty||1)-1)})">−</button><input class="qty-num" type="number" min="1" value="${it.qty}" onchange="setField(${it.id},'qty',this.value)" onfocus="this.select()"><button class="qty-btn" onclick="setField(${it.id},'qty',${(it.qty||1)+1})">+</button></div></div>
-          </div>
-        </div>
-        <div class="metrics">
-          <div class="metric"><div class="metric-label">成本</div><div class="metric-val c-muted">${fmt(r.cost)}</div></div>
-          <div class="metric"><div class="metric-label">營收</div><div class="metric-val c-blue">${fmt(r.rev)}</div></div>
-          <div class="metric"><div class="metric-label">利潤</div><div class="metric-val ${pc}">${fmt(r.profit)}</div></div>
-          <div class="metric"><div class="metric-label">利潤率</div><div class="metric-val ${mc}">${r.margin.toFixed(1)}%</div></div>
-        </div>
-      </div>`;
-    }
-    const p=ALL[it.pi],r=calcPreset(it),pc=r.profit>=0?'c-green':'c-red',mc=r.margin>=0?'c-green':'c-red';
-    const prodOpts=ALL.map((pp,i)=>`<option value="${i}"${i===it.pi?' selected':''}>[${pp.s}] ${pp.name}</option>`).join('');
-    const retailOpts=p.retail.map((pr,i)=>{const dis=pr==null?' disabled':'';const txt=pr==null?`${PRICE_LABELS[i]}（無）`:`${PRICE_LABELS[i]} NT$${pr}`;return`<option value="r${i}"${it.pt==='r'+i?' selected':''}${dis}>${txt}</option>`;}).join('');
-    const costOpts=COST_LEVELS.map(lv=>`<option value="c_${lv.k}"${it.pt==='c_'+lv.k?' selected':''}>${lv.l} NT$${p.costs[lv.k]||0}</option>`).join('');
-    return`<div class="card">
-      <div class="card-head"><span class="series-tag">${p.s}</span><button class="rm-btn" onclick="removeItem(${it.id})">✕</button></div>
-      <div class="card-body">
-        <select class="prod-select" onchange="setField(${it.id},'pi',this.value)">${prodOpts}</select>
-        <div class="controls">
-          <div class="ctrl-group"><span class="ctrl-label">售價類型</span><select class="ctrl-select" onchange="setField(${it.id},'pt',this.value)">${retailOpts}<option disabled>── 進貨價 ──</option>${costOpts}</select></div>
-          <div class="ctrl-group"><span class="ctrl-label">數量</span><div class="qty-ctrl"><button class="qty-btn" onclick="setField(${it.id},'qty',${Math.max(1,(it.qty||1)-1)})">−</button><input class="qty-num" type="number" min="1" value="${it.qty}" onchange="setField(${it.id},'qty',this.value)" onfocus="this.select()"><button class="qty-btn" onclick="setField(${it.id},'qty',${(it.qty||1)+1})">+</button></div></div>
-        </div>
-      </div>
-      <div class="metrics">
-        <div class="metric"><div class="metric-label">成本</div><div class="metric-val c-muted">${fmt(r.cost)}</div></div>
-        <div class="metric"><div class="metric-label">營收</div><div class="metric-val c-blue">${fmt(r.rev)}</div></div>
-        <div class="metric"><div class="metric-label">利潤</div><div class="metric-val ${pc}">${fmt(r.profit)}</div></div>
-        <div class="metric"><div class="metric-label">利潤率</div><div class="metric-val ${mc}">${r.margin.toFixed(1)}%</div></div>
-      </div>
-    </div>`;
-  }).join('');
-  updateTotals();
-}
-
-function updateTotals(){
-  let tR=0,tP=0;items.forEach(it=>{const r=calcItem(it);tR+=r.rev;tP+=r.profit;});
-  const avg=tR>0?tP/tR*100:null;
-  document.getElementById('tRev').textContent=fmt(tR);
-  const pe=document.getElementById('tProfit');pe.textContent=fmt(tP);pe.className='tot-val '+(tP>=0?'c-green':'c-red');
-  const me=document.getElementById('tMargin');me.textContent=avg!==null?avg.toFixed(1)+'%':'—';me.className='tot-val '+(avg===null?'c-muted':avg>=0?'c-green':'c-red');
-}
-
-function saveOrder(){
-  if(!items.length){alert('請先新增商品');return;}
-  const level=getLevel(),note=document.getElementById('orderNote').value.trim();
-  let tR=0,tP=0;
-  const orderItems=items.map(it=>{const r=calcItem(it);tR+=r.rev;tP+=r.profit;return{name:r.name,qty:it.qty,rev:r.rev,profit:r.profit,cost:r.cost};});
+  const months=[...new Set(orders.map(o=>{const d=new Date(o.date);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}))].sort().reverse();
   const now=new Date();
-  orders.unshift({id:Date.now(),date:now.toISOString(),dateStr:now.toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),level,note,items:orderItems,rev:tR,profit:tP,margin:tR>0?tP/tR*100:0});
-  save();items=[];document.getElementById('orderNote').value='';renderItems();
-  alert('訂單已儲存！');
-}
-
-function deleteOrder(id){if(!confirm('確定刪除？'))return;orders=orders.filter(o=>o.id!==id);save();renderStats();}
-
-function deletePeriod(){
-  const filtered=filterOrders();
-  if(!filtered.length)return;
-  const sel=document.getElementById('monthSelect');
-  const pickLabel=sel&&sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'選定月份';
-  const labels={today:'今天',month:'本月',pick:pickLabel,all:'全部'};
-  if(!confirm(`確定刪除「${labels[curPeriod]}」共 ${filtered.length} 筆訂單？此動作無法復原。`))return;
-  const ids=new Set(filtered.map(o=>o.id));
-  orders=orders.filter(o=>!ids.has(o.id));
-  save();renderStats();
+  const thisMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  if(!months.includes(thisMonth))months.unshift(thisMonth);
+  const cur=sel.value||thisMonth;
+  sel.innerHTML=months.map(m=>`<option value="${m}"${m===cur?' selected':''}>${m.replace('-','年')}月</option>`).join('');
 }
 
 function filterOrders(){
@@ -428,44 +577,279 @@ function filterOrders(){
   if(curPeriod==='today'){const t=now.toDateString();return orders.filter(o=>new Date(o.date).toDateString()===t);}
   if(curPeriod==='month'){return orders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});}
   if(curPeriod==='pick'){
-    const sel=document.getElementById('monthSelect');
-    if(!sel||!sel.value)return orders;
-    const [y,m]=sel.value.split('-').map(Number);
-    return orders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===y&&d.getMonth()+1===m;});
+    const val=document.getElementById('monthSelect').value;
+    if(!val)return[];
+    const [y,m]=val.split('-').map(Number);
+    return orders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===y&&d.getMonth()===m-1;});
   }
   return orders;
 }
 
+function renderChart(){
+  const el=document.getElementById('chartBars');
+  if(!el)return;
+  const now=new Date();
+  const months=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.push({y:d.getFullYear(),m:d.getMonth(),label:(d.getMonth()+1)+'月'});
+  }
+  const manuals=JSON.parse(localStorage.getItem('jerosse-manuals')||'[]');
+  const data=months.map(({y,m,label})=>{
+    const mo=orders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===y&&d.getMonth()===m;});
+    const orderProfit=mo.reduce((s,o)=>s+o.profit,0);
+    const monthKey=y+'-'+String(m+1).padStart(2,'0');
+    const manual=manuals.find(x=>x.month===monthKey);
+    const profit=orderProfit+(manual?manual.profit:0);
+    return{label,profit};
+  });
+  const maxAbs=Math.max(...data.map(d=>Math.abs(d.profit)),1);
+  const curM=now.getMonth();
+  const curY=now.getFullYear();
+  document.getElementById('chartBars').innerHTML=data.map(({label,profit},i)=>{
+    const h=Math.max(Math.round(Math.abs(profit)/maxAbs*70),2);
+    const cls=profit>=0?'profit':'loss';
+    const isActive=i===11;
+    const val=profit===0?'':( Math.abs(profit)>=1000?(Math.round(Math.abs(profit)/100)/10)+'k':'');
+    return`<div class="chart-bar-wrap" onclick="jumpToMonth(${i})">
+      <div class="chart-bar-val">${val}</div>
+      <div class="chart-bar ${cls}${isActive?' active':''}" style="height:${h}px"></div>
+      <div class="chart-bar-label">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function jumpToMonth(idx){
+  const now=new Date();
+  const d=new Date(now.getFullYear(),now.getMonth()-(11-idx),1);
+  const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  curPeriod='pick';
+  document.querySelectorAll('.period-btn').forEach((b,i)=>b.classList.toggle('active',i===2));
+  document.getElementById('monthSelectRow').style.display='flex';
+  populateMonthSelect();
+  document.getElementById('monthSelect').value=key;
+  renderStats();
+}
+
+let curStatsTab='overview';
+let curProdPeriod='month';
+
+function switchStatsTab(tab){
+  curStatsTab=tab;
+  document.getElementById('stab-overview').classList.toggle('active',tab==='overview');
+  document.getElementById('stab-products').classList.toggle('active',tab==='products');
+  document.getElementById('stats-overview').style.display=tab==='overview'?'block':'none';
+  document.getElementById('stats-products').style.display=tab==='products'?'block':'none';
+  if(tab==='products')renderProductStats();
+}
+
+function setProdPeriod(p){
+  curProdPeriod=p;
+  document.querySelectorAll('#stats-products .period-btn').forEach((b,i)=>b.classList.toggle('active',['today','month','pick','all'][i]===p));
+  const pickRow=document.getElementById('prodMonthSelectRow');
+  pickRow.style.display=p==='pick'?'flex':'none';
+  if(p==='pick'){
+    const sel=document.getElementById('prodMonthSelect');
+    const now=new Date();
+    const months=[...new Set(orders.map(o=>{const d=new Date(o.date);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}))].sort().reverse();
+    const thisMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    if(!months.includes(thisMonth))months.unshift(thisMonth);
+    sel.innerHTML=months.map(m=>`<option value="${m}">${m.replace('-','年')}月</option>`).join('');
+  }
+  renderProductStats();
+}
+
+function filterOrdersForProd(){
+  const now=new Date();
+  if(curProdPeriod==='today'){const t=now.toDateString();return orders.filter(o=>new Date(o.date).toDateString()===t);}
+  if(curProdPeriod==='month'){return orders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});}
+  if(curProdPeriod==='pick'){
+    const val=document.getElementById('prodMonthSelect').value;
+    if(!val)return[];
+    const [y,m]=val.split('-').map(Number);
+    return orders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===y&&d.getMonth()===m-1;});
+  }
+  return orders;
+}
+
+function renderProductStats(){
+  const filtered=filterOrdersForProd();
+  const map={};
+  filtered.forEach(o=>{
+    const sellLabel=o.sellType||'';
+    o.items.forEach(item=>{
+      const key=sellLabel?sellLabel+'-'+item.name:item.name;
+      if(!map[key])map[key]={name:key,qty:0,rev:0};
+      map[key].qty+=item.qty;
+      map[key].rev+=item.rev;
+    });
+  });
+  const sorted=Object.values(map).sort((a,b)=>b.qty-a.qty);
+  const list=document.getElementById('prodStatsList');
+  if(!sorted.length){list.innerHTML='<div class="empty-state" style="margin-top:12px">此期間尚無記錄</div>';return;}
+  list.innerHTML=sorted.map(r=>`<div class="prod-stat-row">
+    <div class="prod-stat-name">${r.name}</div>
+    <div class="prod-stat-qty">${r.qty}</div>
+    <div class="prod-stat-rev">${r.rev>0?fmt(r.rev):'-'}</div>
+  </div>`).join('');
+}
+
+function getManualProfitForPeriod(){
+  const manuals=JSON.parse(localStorage.getItem('jerosse-manuals')||'[]');
+  const now=new Date();
+  if(curPeriod==='today') return 0;
+  if(curPeriod==='all') return manuals.reduce((s,m)=>s+m.profit,0);
+  if(curPeriod==='month'){
+    const key=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    const m=manuals.find(x=>x.month===key);
+    return m?m.profit:0;
+  }
+  if(curPeriod==='pick'){
+    const val=document.getElementById('monthSelect').value;
+    const m=manuals.find(x=>x.month===val);
+    return m?m.profit:0;
+  }
+  return 0;
+}
+
 function renderStats(){
+  renderChart();
   const filtered=filterOrders();let tR=0,tP=0;filtered.forEach(o=>{tR+=o.rev;tP+=o.profit;});
+  const manualP=getManualProfitForPeriod();
+  tP+=manualP;
   const avg=tR>0?tP/tR*100:null;
-  document.getElementById('sOrders').textContent=filtered.length;
+  document.getElementById('sOrders').textContent=filtered.length+(manualP!==0?' +補登':'');
   document.getElementById('sRev').textContent=fmt(tR);
   const sp=document.getElementById('sProfit');sp.textContent=fmt(tP);sp.className='stat-card-val '+(tP>=0?'c-green':'c-red');
   const sm=document.getElementById('sMargin');sm.textContent=avg!==null?avg.toFixed(1)+'%':'—';sm.className='stat-card-val '+(avg===null?'c-muted':avg>=0?'c-green':'c-red');
   document.getElementById('orderCount').textContent=filtered.length+'筆';
-  const delBtn=document.getElementById('delPeriodBtn');
-  const sel2=document.getElementById('monthSelect');
-  const pickLabel2=sel2&&sel2.options[sel2.selectedIndex]?'刪除 '+sel2.options[sel2.selectedIndex].text:'刪除選定月';
-  const labels={today:'刪除今天',month:'刪除本月',pick:pickLabel2,all:'刪除全部'};
-  delBtn.style.display=filtered.length?'block':'none';
-  delBtn.textContent=labels[curPeriod]||'刪除本期';
   const list=document.getElementById('ordersList');
-  if(!filtered.length){list.innerHTML='<div class="empty-state">此期間尚無訂單記錄</div>';return;}
-  list.innerHTML=filtered.map(o=>{const pc=o.profit>=0?'c-green':'c-red';return`<div class="order-row"><div class="order-top"><div><div class="order-note-text">${o.note||'未備註'} <span class="order-level">· ${o.level}</span></div><div class="order-date">${o.dateStr}</div></div><button class="del-btn" onclick="deleteOrder(${o.id})">刪除</button></div><div class="order-items-str">${o.items.map(i=>`${i.name} ×${i.qty}`).join('、')}</div><div class="order-nums"><span class="onum c-blue">營收 ${fmt(o.rev)}</span><span class="onum ${pc}">利潤 ${fmt(o.profit)}</span><span class="onum c-muted">${o.margin.toFixed(1)}%</span></div></div>`;}).join('');
+  if(!filtered.length){list.innerHTML='<div class="empty-state">此期間尚無訂單記錄</div>';renderManualList();return;}
+  list.innerHTML=filtered.map(o=>{const pc=o.profit>=0?'c-green':'c-red';return`<div class="order-row"><div class="order-top"><div><div class="order-note-text">${o.note||'未備註'} <span class="order-level">· ${o.level}</span></div><div class="order-date">${o.dateStr}</div></div><button class="del-btn" onclick="deleteOrder(${o.id})">刪除</button></div><div class="order-items-str">${o.items.map(i=>i.name+' ×'+i.qty).join('、')}</div><div class="order-nums"><span class="onum c-blue">營收 ${fmt(o.rev)}</span><span class="onum ${pc}">利潤 ${fmt(o.profit)}</span><span class="onum c-muted">${o.margin.toFixed(1)}%</span></div></div>`;}).join('');
+  renderManualList();
 }
 
-/* ── AI 掃描 ── */
+function deleteOrder(id){if(!confirm('確定刪除？'))return;orders=orders.filter(o=>o.id!==id);saveStorage();renderStats();}
 
-function applyAllPriceType(pt){
-  items.forEach(it=>{if(it.type==='preset')it.pt=pt;});
-  document.querySelectorAll('.apply-grid-btn').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('applyGridBtn-'+pt);
-  if(btn)btn.classList.add('active');
-  renderItems();
+function addManual(){
+  const month=document.getElementById('manualMonth').value;
+  const profit=parseFloat(document.getElementById('manualProfit').value);
+  if(!month||isNaN(profit)){alert('請填入月份和金額');return;}
+  const manuals=JSON.parse(localStorage.getItem('jerosse-manuals')||'[]');
+  const existing=manuals.findIndex(m=>m.month===month);
+  if(existing>=0){
+    manuals[existing].profit+=profit;
+  } else {
+    manuals.push({month,profit,id:Date.now()});
+  }
+  manuals.sort((a,b)=>b.month.localeCompare(a.month));
+  localStorage.setItem('jerosse-manuals',JSON.stringify(manuals));
+  document.getElementById('manualMonth').value='';
+  document.getElementById('manualProfit').value='';
+  renderStats();
 }
 
-renderItems();
+function deleteManual(id){
+  if(!confirm('確定刪除此補登記錄？'))return;
+  const manuals=JSON.parse(localStorage.getItem('jerosse-manuals')||'[]');
+  localStorage.setItem('jerosse-manuals',JSON.stringify(manuals.filter(m=>m.id!==id)));
+  renderStats();
+}
+
+function renderManualList(){
+  const manuals=JSON.parse(localStorage.getItem('jerosse-manuals')||'[]');
+  const el=document.getElementById('manualList');
+  if(!manuals.length){el.innerHTML='<div style="font-size:12px;color:var(--mt-hint);padding:4px 2px">尚無補登記錄</div>';return;}
+  el.innerHTML=manuals.map(m=>{
+    const pc=m.profit>=0?'c-green':'c-red';
+    const [y,mo]=m.month.split('-');
+    return`<div class="manual-item">
+      <span class="manual-item-left">${y}年${parseInt(mo)}月</span>
+      <span class="manual-item-right ${pc}">${m.profit>=0?'+':''}NT$${Math.round(m.profit).toLocaleString()}</span>
+      <button class="manual-del" onclick="deleteManual(${m.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function previewReceipt(){
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  if(!items.length){alert('請先選擇商品');return;}
+  const lv=getLevel(),pt=getSellType();
+  const note=document.getElementById('orderNote').value.trim();
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  let total=0;
+  let totalQty=0, totalOrigin=0, totalSaved=0;
+  const rowsHtml=items.map(([key,qty])=>{
+    const isGiftKey=key.startsWith('贈品_');
+    const isBizKey=key.startsWith('創業_');
+    const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
+    const displayName=isGiftKey?'[贈品] '+name:name;
+    const p=ALL.find(x=>x.name===name);
+    const sp=isGiftKey?0:(isBizKey?(p?p.fixed||p.retail[0]||0:0):(p?getSellPrice(p,pt):0));
+    const originPrice=p?p.retail[0]:sp;
+    const lineTotal=sp*qty;
+    const lineOrigin=originPrice*qty;
+    total+=lineTotal;
+    totalQty+=qty;
+    if(!isGiftKey&&!isBizKey){ totalOrigin+=lineOrigin; totalSaved+=(lineOrigin-lineTotal); }
+    if(isGiftKey) return`<div class="receipt-item">
+      <div class="receipt-item-name">${displayName}</div>
+      <div class="receipt-item-origin">—</div>
+      <div class="receipt-item-unit">—</div>
+      <div class="receipt-item-qty">×${qty}</div>
+      <div class="receipt-item-price">贈品</div>
+    </div>`;
+    return`<div class="receipt-item">
+      <div class="receipt-item-name">${displayName}</div>
+      <div class="receipt-item-origin" style="color:var(--mt-hint);text-decoration:${sp<originPrice?'line-through':'none'}">${fmt(originPrice)}</div>
+      <div class="receipt-item-unit" style="color:var(--mt-accent)">${fmt(sp)}</div>
+      <div class="receipt-item-qty">×${qty}</div>
+      <div class="receipt-item-price">${fmt(lineTotal)}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('receiptBody').innerHTML=`
+    <div class="receipt-brand">
+      <div class="receipt-brand-name">婕樂纖 JEROSSE</div>
+      <div class="receipt-brand-sub">健康美麗，從這裡開始</div>
+    </div>
+    ${note?`<div class="receipt-customer">客戶：<span>${note}</span></div>`:''}
+    <div class="receipt-items">
+      <div style="display:grid;grid-template-columns:minmax(0,2fr) 60px 60px 36px 70px;gap:4px;padding-bottom:8px;margin-bottom:4px;border-bottom:0.5px solid var(--mt-border2)">
+        <span style="font-size:11px;color:var(--mt-muted)">商品</span>
+        <span style="font-size:11px;color:var(--mt-muted);text-align:right">原價</span>
+        <span style="font-size:11px;color:var(--mt-muted);text-align:right">單價</span>
+        <span style="font-size:11px;color:var(--mt-muted);text-align:center">數量</span>
+        <span style="font-size:11px;color:var(--mt-muted);text-align:right">金額</span>
+      </div>
+      ${rowsHtml}
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:0.5px solid var(--mt-border2);font-size:13px;color:var(--mt-muted)">
+      <span>總數量</span><span style="font-weight:600;color:var(--mt-text)">${totalQty} 件</span>
+    </div>
+    ${totalOrigin>0&&totalSaved>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#B8A89E">
+      <span>原價總計</span><span style="text-decoration:line-through">NT$${Math.round(totalOrigin).toLocaleString()}</span>
+    </div>`:''}
+    ${totalSaved>0?`<div style="display:flex;justify-content:space-between;padding:6px 0 10px;font-size:13px;color:#4A7C59;font-weight:500">
+      <span>🎉 共省下</span><span>NT$${Math.round(totalSaved).toLocaleString()}</span>
+    </div>`:''}
+    <div class="receipt-total">
+      <span class="receipt-total-label">合計</span>
+      <span class="receipt-total-val">${fmt(total)}</span>
+    </div>
+    <div class="receipt-footer">感謝您的購買，祝您使用愉快</div>
+    <div class="receipt-date">${dateStr}</div>
+  `;
+  document.getElementById('receiptModal').classList.add('open');
+}
+
+function closeReceipt(){
+  document.getElementById('receiptModal').classList.remove('open');
+}
+
+renderTabs();
+renderGrid();
 </script>
 </body>
 </html>
