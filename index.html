@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#8B6F5E">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>LEAD TEAM NO.1</title>
+<title>婕樂纖 點單</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -106,6 +106,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .del-btn:active{background:#F5E0DC;color:var(--mt-red)}
 .receipt-hist-btn{background:none;border:0.5px solid var(--mt-border2);cursor:pointer;color:var(--mt-accent);font-size:12px;padding:3px 10px;border-radius:6px;white-space:nowrap;flex-shrink:0;font-weight:500}
 .receipt-hist-btn:active{background:var(--mt-surface2)}
+.export-btn{padding:7px 14px;background:#4A7C59;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.export-btn:active{opacity:0.85}
+.export-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(44,36,32,0.55);z-index:100;align-items:flex-end}
+.export-modal-backdrop.open{display:flex}
+.export-modal{background:#FAF6F1;border-radius:24px 24px 0 0;padding:20px 20px calc(24px + var(--safe-bottom));width:100%}
+.export-handle{width:36px;height:4px;background:#D4C4B8;border-radius:2px;margin:0 auto 16px}
+.export-title{font-size:17px;font-weight:600;margin-bottom:4px;color:#2C2420}
+.export-sub{font-size:13px;color:#8C7B72;margin-bottom:16px}
+.export-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.export-label{font-size:13px;color:#2C2420;width:60px;flex-shrink:0}
+.export-input{flex:1;padding:9px 12px;border:0.5px solid #E8DDD4;border-radius:10px;background:#fff;color:#2C2420;font-size:13px;outline:none}
+.export-confirm-btn{width:100%;padding:13px;background:#4A7C59;color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px}
+.export-confirm-btn:active{opacity:0.85}
+.export-cancel-btn{width:100%;padding:12px;background:#EDE4DA;color:#8C7B72;border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer}
 .empty-state{text-align:center;padding:3rem 1rem;color:var(--mt-hint);font-size:14px;background:var(--mt-surface);border-radius:16px}
 .month-select-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .month-select{flex:1;padding:8px 12px;border:0.5px solid var(--mt-border2);border-radius:10px;background:var(--mt-card);color:var(--mt-text);font-size:14px;font-weight:500;outline:none}
@@ -182,6 +196,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .preview-btn{padding:10px 16px;background:var(--mt-surface2);color:var(--mt-accent);border:0.5px solid var(--mt-border2);border-radius:12px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
 .preview-btn:active{opacity:0.85}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -252,11 +267,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
 
     <div id="stats-overview">
-    <div class="period-bar">
-      <button class="period-btn" onclick="setPeriod('today')">今天</button>
-      <button class="period-btn active" onclick="setPeriod('month')">本月</button>
-      <button class="period-btn" onclick="setPeriod('pick')">選月份</button>
-      <button class="period-btn" onclick="setPeriod('all')">全部</button>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+      <div class="period-bar" style="flex:1;margin-bottom:0">
+        <button class="period-btn" onclick="setPeriod('today')">今天</button>
+        <button class="period-btn active" onclick="setPeriod('month')">本月</button>
+        <button class="period-btn" onclick="setPeriod('pick')">選月份</button>
+        <button class="period-btn" onclick="setPeriod('all')">全部</button>
+      </div>
+      <button class="export-btn" onclick="openExport()">匯出</button>
     </div>
     <div class="month-select-row" id="monthSelectRow" style="display:none">
       <select class="month-select" id="monthSelect" onchange="renderStats()">
@@ -307,6 +325,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       </div>
       <div id="prodStatsList"></div>
     </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="export-modal-backdrop" id="exportModal">
+  <div class="export-modal">
+    <div class="export-handle"></div>
+    <div class="export-title">匯出訂單</div>
+    <div class="export-sub">選擇日期範圍，匯出 Excel 檔案</div>
+    <div class="export-row">
+      <span class="export-label">開始日期</span>
+      <input class="export-input" type="date" id="exportStart">
+    </div>
+    <div class="export-row">
+      <span class="export-label">結束日期</span>
+      <input class="export-input" type="date" id="exportEnd">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button onclick="setExportRange('today')" style="padding:6px 12px;border:0.5px solid #D4C4B8;border-radius:8px;background:#F2EBE4;font-size:12px;cursor:pointer">今天</button>
+      <button onclick="setExportRange('month')" style="padding:6px 12px;border:0.5px solid #D4C4B8;border-radius:8px;background:#F2EBE4;font-size:12px;cursor:pointer">本月</button>
+      <button onclick="setExportRange('last')" style="padding:6px 12px;border:0.5px solid #D4C4B8;border-radius:8px;background:#F2EBE4;font-size:12px;cursor:pointer">上個月</button>
+      <button onclick="setExportRange('all')" style="padding:6px 12px;border:0.5px solid #D4C4B8;border-radius:8px;background:#F2EBE4;font-size:12px;cursor:pointer">全部</button>
+    </div>
+    <button class="export-confirm-btn" onclick="doExport()">下載 Excel</button>
+    <button class="export-cancel-btn" onclick="closeExport()">取消</button>
   </div>
 </div>
 
@@ -887,6 +930,83 @@ function previewReceipt(){
 
 function closeReceipt(){
   document.getElementById('receiptModal').classList.remove('open');
+}
+
+function openExport(){
+  const now=new Date();
+  const y=now.getFullYear(),m=String(now.getMonth()+1).padStart(2,'0');
+  const firstDay=y+'-'+m+'-01';
+  const lastDay=y+'-'+m+'-'+String(new Date(y,now.getMonth()+1,0).getDate()).padStart(2,'0');
+  document.getElementById('exportStart').value=firstDay;
+  document.getElementById('exportEnd').value=lastDay;
+  document.getElementById('exportModal').classList.add('open');
+}
+function closeExport(){document.getElementById('exportModal').classList.remove('open');}
+
+function setExportRange(range){
+  const now=new Date();
+  const y=now.getFullYear(),m=now.getMonth();
+  let start,end;
+  if(range==='today'){
+    const d=now.toISOString().slice(0,10);
+    start=d;end=d;
+  } else if(range==='month'){
+    start=y+'-'+String(m+1).padStart(2,'0')+'-01';
+    end=y+'-'+String(m+1).padStart(2,'0')+'-'+String(new Date(y,m+1,0).getDate()).padStart(2,'0');
+  } else if(range==='last'){
+    const lm=m===0?11:m-1,ly=m===0?y-1:y;
+    start=ly+'-'+String(lm+1).padStart(2,'0')+'-01';
+    end=ly+'-'+String(lm+1).padStart(2,'0')+'-'+String(new Date(ly,lm+1,0).getDate()).padStart(2,'0');
+  } else {
+    if(!orders.length)return;
+    const dates=orders.map(o=>o.date).sort();
+    start=dates[0].slice(0,10);
+    end=dates[dates.length-1].slice(0,10);
+  }
+  document.getElementById('exportStart').value=start;
+  document.getElementById('exportEnd').value=end;
+}
+
+function doExport(){
+  const start=document.getElementById('exportStart').value;
+  const end=document.getElementById('exportEnd').value;
+  if(!start||!end){alert('請選擇日期範圍');return;}
+  const startD=new Date(start),endD=new Date(end+'T23:59:59');
+  const filtered=orders.filter(o=>{
+    const d=new Date(o.date);
+    return d>=startD&&d<=endD;
+  });
+  if(!filtered.length){alert('此期間無訂單記錄');return;}
+
+  const rows=[['日期','備註','等級','商品明細','總營收','總利潤','利潤率%']];
+  filtered.forEach(o=>{
+    const itemStr=o.items.map(i=>i.name+'×'+i.qty).join('、');
+    rows.push([
+      o.dateStr,
+      o.note||'',
+      o.level||'',
+      itemStr,
+      o.rev,
+      o.profit,
+      parseFloat(o.margin.toFixed(1))
+    ]);
+  });
+
+  // 加總列
+  const totalRev=filtered.reduce((s,o)=>s+o.rev,0);
+  const totalProfit=filtered.reduce((s,o)=>s+o.profit,0);
+  const avgMargin=totalRev>0?totalProfit/totalRev*100:0;
+  rows.push([]);
+  rows.push(['合計','','','共'+filtered.length+'筆',totalRev,totalProfit,parseFloat(avgMargin.toFixed(1))]);
+
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  // 欄寬設定
+  ws['!cols']=[{wch:16},{wch:14},{wch:10},{wch:40},{wch:12},{wch:12},{wch:10}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'訂單');
+  const fname='婕樂纖訂單_'+start+'_'+end+'.xlsx';
+  XLSX.writeFile(wb,fname);
+  closeExport();
 }
 
 renderTabs();
