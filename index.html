@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#8B6F5E">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>LEAD TEAM NO.1</title>
+<title>婕樂纖 點單</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -403,8 +403,8 @@ const ALL=[
   {name:"法樂蓬洗髮露500ml",s:"美肌",costs:{皇家輔導:620,一級輔導:690,二級輔導:770,三級輔導:830,三級零售:860,實習:990},retail:[1280,1180,1100]},
   {name:"法樂蓬洗髮露體驗包8ml",s:"美肌",costs:{皇家輔導:12,一級輔導:14,二級輔導:17,三級輔導:20,三級零售:21,實習:24},retail:[30,null,null]},
   {name:"法樂蓬養髮原液(30ml)",s:"美肌",costs:{皇家輔導:500,一級輔導:570,二級輔導:640,三級輔導:695,三級零售:720,實習:840},retail:[1080,990,900]},
-  {name:"運費",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-70,-70,-70],fixed:-70},
-  {name:"超商運費",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-60,-60,-60],fixed:-60},
+  {name:"宅配運費",s:"創業",costs:{皇家輔導:70,一級輔導:70,二級輔導:70,三級輔導:70,三級零售:70,實習:70},retail:[70,70,70],fixed:70},
+  {name:"超商運費",s:"創業",costs:{皇家輔導:60,一級輔導:60,二級輔導:60,三級輔導:60,三級零售:60,實習:60},retail:[60,60,60],fixed:60},
   {name:"全產品手冊",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-12,-12,-12],fixed:-12},
   {name:"纖體班DM",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-12,-12,-12],fixed:-12},
   {name:"郭雪芙紙袋",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-20,-20,-20],fixed:-20},
@@ -774,13 +774,20 @@ function deleteOrder(id){if(!confirm('確定刪除？'))return;orders=orders.fil
 function showHistReceipt(id){
   const o=orders.find(x=>x.id===id);
   if(!o)return;
+  let totalQty=0,totalOrigin=0,totalSaved=0;
   const rowsHtml=o.items.map(item=>{
     const isGift=item.name.startsWith('[贈品]');
     const isBiz=item.name.startsWith('[創業]');
-    const sp=item.qty>0?item.rev/item.qty:0;
+    const displayName=item.name.replace('[贈品] ','').replace('[創業] ','');
+    const sp=item.qty>0?Math.round(item.rev/item.qty):0;
+    const p=ALL.find(x=>x.name===displayName);
+    const originPrice=p?(p.retail[0]||p.retail.find(x=>x!=null)||sp):sp;
+    const lineOrigin=originPrice*item.qty;
+    totalQty+=item.qty;
+    if(!isGift&&!isBiz){totalOrigin+=lineOrigin;totalSaved+=(lineOrigin-item.rev);}
     return`<div class="receipt-item">
-      <div class="receipt-item-name">${item.name.replace('[贈品] ','').replace('[創業] ','')}</div>
-      <div class="receipt-item-origin"></div>
+      <div class="receipt-item-name">${displayName}</div>
+      <div class="receipt-item-origin" style="color:var(--mt-hint);text-decoration:${(!isGift&&!isBiz&&sp<originPrice)?'line-through':'none'}">${isGift||isBiz?'—':fmt(originPrice)}</div>
       <div class="receipt-item-unit" style="color:var(--mt-accent)">${isGift?'贈品':(sp<0?'支出':fmt(sp))}</div>
       <div class="receipt-item-qty">×${item.qty}</div>
       <div class="receipt-item-price">${isGift?'贈品':(item.rev<0?'－'+fmt(Math.abs(item.rev)):fmt(item.rev))}</div>
@@ -795,16 +802,25 @@ function showHistReceipt(id){
     <div class="receipt-items">
       <div style="display:grid;grid-template-columns:minmax(0,2fr) 60px 60px 36px 70px;gap:4px;padding-bottom:8px;border-bottom:0.5px solid var(--mt-border2);margin-bottom:4px">
         <span style="font-size:11px;color:var(--mt-muted)">商品</span>
-        <span style="font-size:11px;color:var(--mt-muted)"></span>
+        <span style="font-size:11px;color:var(--mt-muted);text-align:right">原價</span>
         <span style="font-size:11px;color:var(--mt-muted);text-align:right">單價</span>
         <span style="font-size:11px;color:var(--mt-muted);text-align:center">數量</span>
         <span style="font-size:11px;color:var(--mt-muted);text-align:right">金額</span>
       </div>
       ${rowsHtml}
     </div>
-    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:0.5px solid var(--mt-border2);font-size:13px;color:var(--mt-muted)">
-      <span>等級</span><span style="font-weight:500;color:var(--mt-text)">${o.level}</span>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:0.5px solid var(--mt-border2);font-size:13px;color:var(--mt-muted)">
+      <span>總數量</span><span style="font-weight:500;color:var(--mt-text)">${totalQty} 件</span>
     </div>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:var(--mt-hint)">
+      <span>等級</span><span>${o.level}${o.sellType?' · '+o.sellType:''}</span>
+    </div>
+    ${totalOrigin>0&&totalSaved>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#B8A89E">
+      <span>原價總計</span><span style="text-decoration:line-through">NT$${Math.round(totalOrigin).toLocaleString()}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:6px 0 10px;font-size:13px;color:#4A7C59;font-weight:500">
+      <span>🎉 共省下</span><span>NT$${Math.round(totalSaved).toLocaleString()}</span>
+    </div>`:''}
     <div class="receipt-total">
       <span class="receipt-total-label">合計</span>
       <span class="receipt-total-val">${fmt(o.rev)}</span>
@@ -871,7 +887,7 @@ function previewReceipt(){
     const displayName=isGiftKey?'[贈品] '+name:name;
     const p=ALL.find(x=>x.name===name);
     const sp=isGiftKey?0:(isBizKey?(p?p.fixed||p.retail[0]||0:0):(p?getSellPrice(p,pt):0));
-    const originPrice=p?p.retail[0]:sp;
+    const originPrice=p?(p.retail[0]||p.retail.find(x=>x!=null)||sp):sp;
     const lineTotal=sp*qty;
     const lineOrigin=originPrice*qty;
     total+=lineTotal;
@@ -978,13 +994,14 @@ function doExport(){
   });
   if(!filtered.length){alert('此期間無訂單記錄');return;}
 
-  const rows=[['日期','備註','等級','商品明細','總營收','總利潤','利潤率%']];
+  const rows=[['日期','備註','等級','售價類型','商品明細','總營收','總利潤','利潤率%']];
   filtered.forEach(o=>{
     const itemStr=o.items.map(i=>i.name+'×'+i.qty).join('、');
     rows.push([
       o.dateStr,
       o.note||'',
       o.level||'',
+      o.sellType||'',
       itemStr,
       o.rev,
       o.profit,
@@ -997,11 +1014,11 @@ function doExport(){
   const totalProfit=filtered.reduce((s,o)=>s+o.profit,0);
   const avgMargin=totalRev>0?totalProfit/totalRev*100:0;
   rows.push([]);
-  rows.push(['合計','','','共'+filtered.length+'筆',totalRev,totalProfit,parseFloat(avgMargin.toFixed(1))]);
+  rows.push(['合計','','','','共'+filtered.length+'筆',totalRev,totalProfit,parseFloat(avgMargin.toFixed(1))]);
 
   const ws=XLSX.utils.aoa_to_sheet(rows);
   // 欄寬設定
-  ws['!cols']=[{wch:16},{wch:14},{wch:10},{wch:40},{wch:12},{wch:12},{wch:10}];
+  ws['!cols']=[{wch:16},{wch:14},{wch:10},{wch:12},{wch:40},{wch:12},{wch:12},{wch:10}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'訂單');
   const fname='婕樂纖訂單_'+start+'_'+end+'.xlsx';
