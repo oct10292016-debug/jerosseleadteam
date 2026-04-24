@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#8B6F5E">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<title>LEAD TEAM NO.1</title>
+<title>婕樂纖 點單</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -403,8 +403,10 @@ const ALL=[
   {name:"法樂蓬洗髮露500ml",s:"美肌",costs:{皇家輔導:620,一級輔導:690,二級輔導:770,三級輔導:830,三級零售:860,實習:990},retail:[1280,1180,1100]},
   {name:"法樂蓬洗髮露體驗包8ml",s:"美肌",costs:{皇家輔導:12,一級輔導:14,二級輔導:17,三級輔導:20,三級零售:21,實習:24},retail:[30,null,null]},
   {name:"法樂蓬養髮原液(30ml)",s:"美肌",costs:{皇家輔導:500,一級輔導:570,二級輔導:640,三級輔導:695,三級零售:720,實習:840},retail:[1080,990,900]},
-  {name:"宅配運費",s:"創業",costs:{皇家輔導:70,一級輔導:70,二級輔導:70,三級輔導:70,三級零售:70,實習:70},retail:[70,70,70],fixed:70},
-  {name:"超商運費",s:"創業",costs:{皇家輔導:60,一級輔導:60,二級輔導:60,三級輔導:60,三級零售:60,實習:60},retail:[60,60,60],fixed:60},
+  {name:"宅配70(客付)",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[70,70,70],fixed:70},
+  {name:"超商60(客付)",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[60,60,60],fixed:60},
+  {name:"宅配70(我付)",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-70,-70,-70],fixed:-70},
+  {name:"超商60(我付)",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-60,-60,-60],fixed:-60},
   {name:"全產品手冊",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-12,-12,-12],fixed:-12},
   {name:"纖體班DM",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-12,-12,-12],fixed:-12},
   {name:"郭雪芙紙袋",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-20,-20,-20],fixed:-20},
@@ -815,7 +817,7 @@ function showHistReceipt(id){
     <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:var(--mt-hint)">
       <span>等級</span><span>${o.level}${o.sellType?' · '+o.sellType:''}</span>
     </div>
-    ${totalOrigin>0&&totalSaved>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#B8A89E">
+    ${totalSaved>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#B8A89E">
       <span>原價總計</span><span style="text-decoration:line-through">NT$${Math.round(totalOrigin).toLocaleString()}</span>
     </div>
     <div style="display:flex;justify-content:space-between;padding:6px 0 10px;font-size:13px;color:#4A7C59;font-weight:500">
@@ -890,7 +892,8 @@ function previewReceipt(){
     const originPrice=p?(p.retail[0]||p.retail.find(x=>x!=null)||sp):sp;
     const lineTotal=sp*qty;
     const lineOrigin=originPrice*qty;
-    total+=lineTotal;
+    const isFreight=isBizKey&&sp<0;
+    if(isFreight){total+=Math.abs(lineTotal);}else{total+=lineTotal;}
     totalQty+=qty;
     if(!isGiftKey&&!isBizKey){ totalOrigin+=lineOrigin; totalSaved+=(lineOrigin-lineTotal); }
     if(isGiftKey) return`<div class="receipt-item">
@@ -899,6 +902,13 @@ function previewReceipt(){
       <div class="receipt-item-unit">—</div>
       <div class="receipt-item-qty">×${qty}</div>
       <div class="receipt-item-price">贈品</div>
+    </div>`;
+    if(isBizKey&&sp<0) return`<div class="receipt-item">
+      <div class="receipt-item-name">${displayName}</div>
+      <div class="receipt-item-origin">—</div>
+      <div class="receipt-item-unit" style="color:var(--mt-muted)">NT$${Math.abs(sp)}</div>
+      <div class="receipt-item-qty">×${qty}</div>
+      <div class="receipt-item-price">NT$${Math.abs(lineTotal)}</div>
     </div>`;
     return`<div class="receipt-item">
       <div class="receipt-item-name">${displayName}</div>
@@ -928,7 +938,7 @@ function previewReceipt(){
     <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:0.5px solid var(--mt-border2);font-size:13px;color:var(--mt-muted)">
       <span>總數量</span><span style="font-weight:600;color:var(--mt-text)">${totalQty} 件</span>
     </div>
-    ${totalOrigin>0&&totalSaved>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#B8A89E">
+    ${totalSaved>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#B8A89E">
       <span>原價總計</span><span style="text-decoration:line-through">NT$${Math.round(totalOrigin).toLocaleString()}</span>
     </div>`:''}
     ${totalSaved>0?`<div style="display:flex;justify-content:space-between;padding:6px 0 10px;font-size:13px;color:#4A7C59;font-weight:500">
