@@ -71,6 +71,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .cart-ctrl-btn{width:22px;height:22px;border-radius:50%;border:0.5px solid var(--mt-border2);background:var(--mt-card);color:var(--mt-text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-weight:500}
 .cart-ctrl-btn:active{background:var(--mt-surface2)}
 .cart-row-qty{font-weight:600;color:var(--mt-accent);min-width:20px;text-align:center}
+.cart-qty-input{width:38px;height:26px;border:0.5px solid var(--mt-border2);border-radius:6px;background:var(--mt-card);color:var(--mt-accent);font-size:14px;font-weight:600;text-align:center;outline:none;padding:0}
 
 /* Bottom nav */
 .bottom-nav{display:flex;background:var(--mt-card);border-top:0.5px solid var(--mt-border);padding-bottom:var(--safe-bottom);flex-shrink:0}
@@ -138,6 +139,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .gift-btn{border-color:#C8A882;background:#FBF5EE}
 .gift-btn.has-qty{border-color:#8B6F5E;background:#F5EBE0}
 .gift-btn .prod-cost{color:#8B6F5E}
+/* 活動組合 */
+.event-wrap{padding:12px 12px 80px}
+.event-add-btn{width:100%;padding:12px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:12px}
+.event-add-btn:active{opacity:0.85}
+.event-card{background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:14px;padding:14px;margin-bottom:10px;position:relative}
+.event-card.has-qty{border-color:var(--mt-accent);background:#FBF8F5}
+.event-card-name{font-size:15px;font-weight:600;color:var(--mt-text);margin-bottom:4px}
+.event-card-items{font-size:12px;color:var(--mt-muted);margin-bottom:8px;line-height:1.6}
+.event-card-price{font-size:18px;font-weight:600;color:var(--mt-accent)}
+.event-card-cost{font-size:11px;color:var(--mt-hint);margin-top:2px}
+.event-card-actions{display:flex;gap:8px;margin-top:10px;align-items:center}
+.event-qty-btn{width:28px;height:28px;border-radius:50%;border:0.5px solid var(--mt-border2);background:var(--mt-surface);color:var(--mt-text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0}
+.event-qty{font-size:15px;font-weight:600;color:var(--mt-accent);min-width:24px;text-align:center}
+.event-edit-btn{margin-left:auto;padding:5px 12px;background:var(--mt-surface2);border:0.5px solid var(--mt-border2);border-radius:8px;font-size:12px;color:var(--mt-muted);cursor:pointer}
+.event-del-btn{padding:5px 10px;background:none;border:0.5px solid var(--mt-border2);border-radius:8px;font-size:12px;color:var(--mt-hint);cursor:pointer}
+.event-del-btn:active{color:var(--mt-red);background:#FEF0EF}
+/* 活動編輯 Modal */
+.event-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(44,36,32,0.55);z-index:200;align-items:flex-end}
+.event-modal-backdrop.open{display:flex}
+.event-modal{background:#FAF6F1;border-radius:24px 24px 0 0;padding:20px 20px calc(24px + var(--safe-bottom));width:100%;max-height:90vh;overflow-y:auto}
+.event-modal-title{font-size:17px;font-weight:600;margin-bottom:16px}
+.event-field-label{font-size:12px;color:var(--mt-muted);margin-bottom:5px;letter-spacing:0.3px}
+.event-field{width:100%;padding:10px 12px;border:0.5px solid var(--mt-border);border-radius:10px;background:var(--mt-card);color:var(--mt-text);font-size:14px;outline:none;margin-bottom:12px}
+.event-prod-check{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--mt-card);border:0.5px solid var(--mt-border);border-radius:10px;margin-bottom:6px;cursor:pointer}
+.event-prod-check input[type=checkbox]{width:18px;height:18px;accent-color:var(--mt-accent);flex-shrink:0}
+.event-prod-label{flex:1;font-size:13px;color:var(--mt-text)}
+.event-prod-qty{width:50px;padding:5px 8px;border:0.5px solid var(--mt-border);border-radius:8px;font-size:13px;text-align:center;outline:none;background:var(--mt-surface)}
+.event-save-btn{width:100%;padding:13px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px}
+.event-save-btn:active{opacity:0.85}
+.event-cancel-btn{width:100%;padding:12px;background:var(--mt-surface2);color:var(--mt-muted);border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;margin-top:8px}
+.event-empty{text-align:center;padding:3rem 1rem;color:var(--mt-hint);font-size:14px;background:var(--mt-surface);border-radius:16px}
 .biz-btn{border-color:#A8C8B8;background:#F0F7F4}
 .biz-btn.has-qty{border-color:#4A7C59;background:#E8F4EE}
 .biz-btn .prod-cost{color:#4A7C59;font-size:18px}
@@ -166,6 +198,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .prod-stat-name{color:var(--mt-text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prod-stat-qty{color:var(--mt-accent);font-weight:600;text-align:center}
 .prod-stat-rev{color:var(--mt-blue);font-weight:500;text-align:right;font-size:12px}
+.scan-fab{display:none}
+.scan-fab:active{opacity:0.85;transform:scale(0.95)}
+.scan-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(44,36,32,0.55);z-index:100;align-items:flex-end}
+.scan-modal-backdrop.open{display:flex}
+.scan-modal{background:#FAF6F1;border-radius:24px 24px 0 0;padding:20px 20px calc(20px + var(--safe-bottom));width:100%;max-height:88vh;overflow-y:auto}
+.scan-handle{width:36px;height:4px;background:#D4C4B8;border-radius:2px;margin:0 auto 16px}
+.scan-title{font-size:17px;font-weight:600;margin-bottom:4px}
+.scan-sub{font-size:13px;color:#8C7B72;margin-bottom:16px}
+.scan-drop{border:1.5px dashed #D4C4B8;border-radius:14px;padding:24px 20px;text-align:center;cursor:pointer;background:#F2EBE4;margin-bottom:12px}
+.scan-preview-img{width:100%;max-height:160px;object-fit:contain;border-radius:10px;margin-bottom:12px;display:none}
+.scan-loading{display:none;align-items:center;justify-content:center;gap:10px;padding:14px;font-size:13px;color:#8C7B72}
+.scan-spin{width:18px;height:18px;border:2px solid #D4C4B8;border-top-color:#8B6F5E;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scan-result-box{display:none;background:#fff;border:0.5px solid #E8DDD4;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.scan-result-label{font-size:10px;color:#8C7B72;letter-spacing:0.4px;text-transform:uppercase;margin-bottom:8px}
+.scan-item-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid #E8DDD4;font-size:13px}
+.scan-item-row:last-child{border-bottom:none}
+.scan-item-qty{font-weight:500;color:#8B6F5E}
+.scan-apply-btn{width:100%;padding:13px;background:#4A7C59;color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px}
+.scan-cancel-btn{width:100%;padding:12px;background:#EDE4DA;color:#8C7B72;border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer}
+.scan-error{display:none;background:#FEF0EF;border:0.5px solid #F5C5C2;border-radius:10px;padding:10px 14px;font-size:13px;color:#A0453A;margin-bottom:12px}
 
 /* 客戶單據 */
 .receipt-backdrop{display:none;position:fixed;inset:0;background:rgba(44,36,32,0.6);z-index:200;align-items:flex-end;justify-content:center}
@@ -207,16 +260,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="header-row">
       <span class="app-title">婕樂纖</span>
       <select class="level-select" id="myLevel" onchange="renderGrid()">
+        <option value="皇家輔導" selected>皇家輔導</option>
+        <option value="一級輔導">一級輔導</option>
         <option value="二級輔導">二級輔導</option>
         <option value="三級輔導">三級輔導</option>
         <option value="三級零售">三級零售</option>
-        <option value="實習" selected>實習</option>
+        <option value="實習">實習</option>
       </select>
       <select class="sell-type-select" id="sellType" onchange="renderGrid()">
         <option value="r0">售：零售價</option>
         <option value="r1">售：任兩盒</option>
         <option value="r2">售：VIP價</option>
         <option disabled>── 售：進貨價 ──</option>
+        <option value="c_一級輔導">售：一級進貨</option>
         <option value="c_二級輔導">售：二級進貨</option>
         <option value="c_三級輔導">售：三級輔進貨</option>
         <option value="c_三級零售">售：三級零進貨</option>
@@ -225,10 +281,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
   </div>
 
-  <div class="tab-bar" id="tabBar"></div>
+  <div class="tab-bar" id="tabBar">
+    <button class="series-tab" id="tab-event" onclick="switchToEvent()">活動</button>
+  </div>
 
-  <div class="grid-area">
+  <div class="grid-area" id="gridArea">
     <div class="product-grid" id="productGrid"></div>
+  </div>
+  <div class="event-wrap" id="eventArea" style="display:none">
+    <button class="event-add-btn" onclick="openEventModal(null)">＋ 新增活動組合</button>
+    <div id="eventList"></div>
   </div>
 
   <div class="bottom-bar">
@@ -249,6 +311,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         </div>
       </div>
       <button class="clear-btn" onclick="clearCart()">清空</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button onclick="openScan()" style="flex:1;padding:10px;background:#5E7EA0;color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:500;cursor:pointer">📷 掃描截圖</button>
     </div>
     <div class="bottom-actions">
       <input class="note-input-small" id="orderNote" type="text" placeholder="備註（客戶名稱）">
@@ -353,6 +418,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   </div>
 </div>
 
+<!-- Event Modal -->
+<div class="event-modal-backdrop" id="eventModal">
+  <div class="event-modal">
+    <div class="event-modal-title" id="eventModalTitle">新增活動組合</div>
+    <div class="event-field-label">組合名稱</div>
+    <input class="event-field" id="eventName" type="text" placeholder="例：4月活動組合">
+    <div class="event-field-label">活動總價（NT$）</div>
+    <input class="event-field" id="eventPrice" type="number" placeholder="例：2800" inputmode="numeric">
+    <div class="event-field-label">包含商品（選擇並設定數量）</div>
+    <div id="eventProdList"></div>
+    <button class="event-save-btn" onclick="saveEventBundle()">儲存</button>
+    <button class="event-cancel-btn" onclick="closeEventModal()">取消</button>
+  </div>
+</div>
+
 <!-- Receipt Modal -->
 <div class="receipt-backdrop" id="receiptModal">
   <div class="receipt-sheet">
@@ -361,6 +441,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="receipt-actions">
       <button class="receipt-close-btn" onclick="closeReceipt()">關閉</button>
     </div>
+  </div>
+</div>
+
+<!-- Scan FAB -->
+<!-- Scan Modal -->
+<div class="scan-modal-backdrop" id="scanModal">
+  <div class="scan-modal">
+    <div class="scan-handle"></div>
+    <div class="scan-title">掃描叫貨截圖</div>
+    <div class="scan-sub">上傳截圖，AI 自動辨識商品與數量</div>
+    <input type="file" id="scanImgInput" accept="image/*" style="display:none" onchange="handleScanImg(this)">
+    <div class="scan-drop" onclick="document.getElementById('scanImgInput').click()">
+      <div style="font-size:28px;margin-bottom:6px">📷</div>
+      <div style="font-size:14px;color:#8C7B72">點此選擇圖片</div>
+      <div style="font-size:12px;color:#B8A89E;margin-top:4px">支援截圖、相片</div>
+    </div>
+    <img id="scanPreviewImg" class="scan-preview-img">
+    <div class="scan-loading" id="scanLoading"><div class="scan-spin"></div><span>AI 辨識中...</span></div>
+    <div class="scan-error" id="scanError"></div>
+    <div class="scan-result-box" id="scanResult">
+      <div class="scan-result-label">辨識結果</div>
+      <div id="scanResultItems"></div>
+    </div>
+    <button class="scan-apply-btn" id="scanApplyBtn" style="display:none" onclick="applyScanResult()">套用到點單</button>
+    <button class="scan-cancel-btn" onclick="closeScan()">取消</button>
+    <button onclick="resetScanKey()" style="background:none;border:none;color:var(--mt-hint);font-size:11px;cursor:pointer;margin-top:8px;width:100%;text-align:center;padding:4px">重設 API Key</button>
   </div>
 </div>
 
@@ -403,6 +509,10 @@ const ALL=[
   {name:"法樂蓬洗髮露500ml",s:"美肌",costs:{皇家輔導:620,一級輔導:690,二級輔導:770,三級輔導:830,三級零售:860,實習:990},retail:[1280,1180,1100]},
   {name:"法樂蓬洗髮露體驗包8ml",s:"美肌",costs:{皇家輔導:12,一級輔導:14,二級輔導:17,三級輔導:20,三級零售:21,實習:24},retail:[30,null,null]},
   {name:"法樂蓬養髮原液(30ml)",s:"美肌",costs:{皇家輔導:500,一級輔導:570,二級輔導:640,三級輔導:695,三級零售:720,實習:840},retail:[1080,990,900]},
+  {name:"返利 10,000",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[10000,10000,10000],fixed:10000},
+  {name:"返利 1,000",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[1000,1000,1000],fixed:1000},
+  {name:"返利 100",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[100,100,100],fixed:100},
+  {name:"返利 10",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[10,10,10],fixed:10},
   {name:"宅配70(客付)",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[70,70,70],fixed:70},
   {name:"超商60(客付)",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[60,60,60],fixed:60},
   {name:"宅配70(我付)",s:"創業",costs:{皇家輔導:0,一級輔導:0,二級輔導:0,三級輔導:0,三級零售:0,實習:0},retail:[-70,-70,-70],fixed:-70},
@@ -440,12 +550,148 @@ function getSellPrice(p,pt){
 function fmt(n){return'NT$'+Math.round(n).toLocaleString();}
 
 // Tab bar
+// ── 活動組合 ──
+let events=JSON.parse(localStorage.getItem('jerosse-events')||'[]');
+let editingEventId=null;
+let curTab='product'; // 'product' or 'event'
+
+function saveEvents(){localStorage.setItem('jerosse-events',JSON.stringify(events));}
+
+function switchToEvent(){
+  curTab='event';
+  document.getElementById('gridArea').style.display='none';
+  document.getElementById('eventArea').style.display='block';
+  document.querySelectorAll('.series-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-event').classList.add('active');
+  renderEventList();
+}
+
+function switchToProduct(s){
+  curTab='product';
+  document.getElementById('gridArea').style.display='block';
+  document.getElementById('eventArea').style.display='none';
+  document.getElementById('tab-event').classList.remove('active');
+  if(s)selectSeries(s);
+}
+
+function openEventModal(id){
+  editingEventId=id;
+  const ev=id!=null?events.find(e=>e.id===id):null;
+  document.getElementById('eventModalTitle').textContent=ev?'編輯活動組合':'新增活動組合';
+  document.getElementById('eventName').value=ev?ev.name:'';
+  document.getElementById('eventPrice').value=ev?ev.price:'';
+  // 產生商品清單
+  const prodList=document.getElementById('eventProdList');
+  const allProds=ALL.filter(p=>p.s!=='創業');
+  prodList.innerHTML=allProds.map(p=>{
+    const sel=ev?ev.items.find(i=>i.name===p.name):null;
+    return`<div class="event-prod-check">
+      <input type="checkbox" id="eprod_${p.name}" ${sel?'checked':''} onchange="toggleEventProd('${p.name}')">
+      <label class="event-prod-label" for="eprod_${p.name}">${p.name}</label>
+      <input class="event-prod-qty" type="number" id="eqty_${p.name}" value="${sel?sel.qty:1}" min="1" inputmode="numeric" style="${sel?'':'display:none'}">
+    </div>`;
+  }).join('');
+  document.getElementById('eventModal').classList.add('open');
+}
+
+function toggleEventProd(name){
+  const cb=document.getElementById('eprod_'+name);
+  const qtyInput=document.getElementById('eqty_'+name);
+  qtyInput.style.display=cb.checked?'':'none';
+  if(cb.checked)qtyInput.focus();
+}
+
+function closeEventModal(){
+  document.getElementById('eventModal').classList.remove('open');
+  editingEventId=null;
+}
+
+function saveEventBundle(){
+  const name=document.getElementById('eventName').value.trim();
+  const price=parseFloat(document.getElementById('eventPrice').value);
+  if(!name){alert('請填入組合名稱');return;}
+  if(isNaN(price)||price<0){alert('請填入活動總價');return;}
+  const allProds=ALL.filter(p=>p.s!=='創業');
+  const items=[];
+  allProds.forEach(p=>{
+    const cb=document.getElementById('eprod_'+p.name);
+    if(cb&&cb.checked){
+      const qty=parseInt(document.getElementById('eqty_'+p.name).value)||1;
+      items.push({name:p.name,qty});
+    }
+  });
+  if(!items.length){alert('請至少選擇一個商品');return;}
+  if(editingEventId!=null){
+    const idx=events.findIndex(e=>e.id===editingEventId);
+    if(idx>=0)events[idx]={...events[idx],name,price,items};
+  } else {
+    events.push({id:Date.now(),name,price,items});
+  }
+  saveEvents();
+  closeEventModal();
+  renderEventList();
+}
+
+function deleteEvent(id){
+  if(!confirm('確定刪除此活動組合？'))return;
+  events=events.filter(e=>e.id!==id);
+  saveEvents();
+  renderEventList();
+}
+
+function addEventToCart(id){
+  const ev=events.find(e=>e.id===id);
+  if(!ev)return;
+  const key='活動_'+id;
+  cart[key]=(cart[key]||0)+1;
+  renderEventList();
+  renderCartPreview();
+  updateSummary();
+}
+
+function removeEventFromCart(id){
+  const key='活動_'+id;
+  if(cart[key]>0){cart[key]--;if(cart[key]===0)delete cart[key];}
+  renderEventList();
+  renderCartPreview();
+  updateSummary();
+}
+
+function renderEventList(){
+  const list=document.getElementById('eventList');
+  if(!list)return;
+  if(!events.length){list.innerHTML='<div class="event-empty">尚無活動組合<br>點上方「新增」建立</div>';return;}
+  const lv=getLevel();
+  list.innerHTML=events.map(ev=>{
+    const key='活動_'+ev.id;
+    const qty=cart[key]||0;
+    const cost=ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
+    const itemStr=ev.items.map(i=>i.name+(i.qty>1?' ×'+i.qty:'')).join('、');
+    return`<div class="event-card${qty>0?' has-qty':''}">
+      <div class="event-card-name">${ev.name}${qty>0?` <span style="color:var(--mt-accent);font-size:13px">× ${qty}</span>`:''}</div>
+      <div class="event-card-items">${itemStr}</div>
+      <div class="event-card-price">NT$${Math.round(ev.price).toLocaleString()}</div>
+      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}　利潤 NT$${Math.round(ev.price-cost).toLocaleString()}</div>
+      <div class="event-card-actions">
+        <button class="event-qty-btn" onclick="removeEventFromCart(${ev.id})">－</button>
+        <span class="event-qty">${qty}</span>
+        <button class="event-qty-btn" onclick="addEventToCart(${ev.id})">＋</button>
+        <button class="event-edit-btn" onclick="openEventModal(${ev.id})">編輯</button>
+        <button class="event-del-btn" onclick="deleteEvent(${ev.id})">刪除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderTabs(){
   const bar=document.getElementById('tabBar');
-  bar.innerHTML=SERIES.map(s=>`<button class="series-tab${s===curSeries?' active':''}" onclick="selectSeries('${s}')">${s}</button>`).join('');
+  bar.innerHTML=SERIES.map(s=>`<button class="series-tab${s===curSeries?' active':''}" onclick="selectSeries('${s}')">${s}</button>`).join('')
+    +`<button class="series-tab" id="tab-event" onclick="switchToEvent()">活動</button>`;
+  if(curTab==='event') document.getElementById('tab-event').classList.add('active');
 }
 
 function selectSeries(s){
+  if(curTab==='event') switchToProduct(s);
   curSeries=s;
   renderTabs();
   renderGrid();
@@ -500,6 +746,12 @@ function removeFromCart(e,idx){
   if(cart[p.name]>0){cart[p.name]--;if(cart[p.name]===0)delete cart[p.name];}
   renderGrid();renderCartPreview();
 }
+function setCartQty(key,val){
+  const n=parseInt(val);
+  if(isNaN(n)||n<=0){delete cart[key];}
+  else{cart[key]=n;}
+  renderGrid();renderCartPreview();
+}
 function removeFromCartByKey(key){
   if(cart[key]>0){cart[key]--;if(cart[key]===0)delete cart[key];}
   renderGrid();renderCartPreview();
@@ -520,13 +772,17 @@ function renderCartPreview(){
   preview.innerHTML=items.map(([key,qty])=>{
     const isGiftKey=key.startsWith('贈品_');
     const isBizKey=key.startsWith('創業_');
-    const label=isGiftKey?'[贈品] '+key.slice(3):(isBizKey?'[創業] '+key.slice(3):key);
+    const isEventKey=key.startsWith('活動_');
+    const label=isEventKey?'[活動] '+(events.find(e=>e.id===parseInt(key.slice(3)))||{name:key}).name:(isGiftKey?'[贈品] '+key.slice(3):(isBizKey?'[創業] '+key.slice(3):key));
     const safeKey=key.replace(/'/g,"\\'");
     return`<div class="cart-row">
       <span class="cart-row-name">${label}</span>
       <div class="cart-row-ctrl">
         <button class="cart-ctrl-btn" onclick="removeFromCartByKey('${safeKey}')">－</button>
-        <span class="cart-row-qty">${qty}</span>
+        <input class="cart-qty-input" type="number" min="0" value="${qty}" 
+          onchange="setCartQty('${safeKey}',this.value)"
+          onclick="this.select()"
+          inputmode="numeric">
         <button class="cart-ctrl-btn" onclick="cart['${safeKey}']=(cart['${safeKey}']||0)+1;renderGrid();renderCartPreview()">＋</button>
       </div>
     </div>`;
@@ -540,6 +796,13 @@ function updateSummary(){
     if(qty<=0)return;
     const isGiftKey=key.startsWith('贈品_');
     const isBizKey=key.startsWith('創業_');
+    const isEventKey=key.startsWith('活動_');
+    if(isEventKey){
+      const eid=parseInt(key.slice(3));
+      const ev=events.find(e=>e.id===eid);if(!ev)return;
+      const ecost=ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
+      tR+=ev.price*qty;tP+=(ev.price-ecost)*qty;return;
+    }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
     const p=ALL.find(x=>x.name===name);if(!p)return;
     const cost=isGiftKey||isBizKey?0:(p.costs[lv]||0);
@@ -564,6 +827,15 @@ function saveOrder(){
   const orderItems=items.map(([key,qty])=>{
     const isGiftKey=key.startsWith('贈品_');
     const isBizKey=key.startsWith('創業_');
+    const isEventKey=key.startsWith('活動_');
+    if(isEventKey){
+      const eid=parseInt(key.slice(3));
+      const ev=events.find(e=>e.id===eid);if(!ev)return;
+      const ecost=ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
+      const rev=ev.price*qty,profit=(ev.price-ecost)*qty;
+      tR+=rev;tP+=profit;
+      orderItems.push({name:'[活動] '+ev.name,qty,rev,profit,cost:ecost});return;
+    }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
     const displayName=isGiftKey?'[贈品] '+name:(isBizKey?'[創業] '+name:name);
     const p=ALL.find(x=>x.name===name);
@@ -956,6 +1228,88 @@ function previewReceipt(){
 
 function closeReceipt(){
   document.getElementById('receiptModal').classList.remove('open');
+}
+
+function getScanApiKey(){return localStorage.getItem('jerosse-scan-key')||'';}
+let scanResultData=[];
+
+function resetScanKey(){
+  if(confirm('確定要重設 API Key 嗎？')){
+    localStorage.removeItem('jerosse-scan-key');
+    closeScan();
+    alert('已清除，下次點掃描時重新輸入');
+  }
+}
+function openScan(){
+  if(!getScanApiKey()){
+    const key=prompt('請輸入你的 Anthropic API Key：\n（只需輸入一次，會儲存在手機）');
+    if(!key||!key.trim()){return;}
+    localStorage.setItem('jerosse-scan-key',key.trim());
+  }
+  document.getElementById('scanModal').classList.add('open');
+  document.getElementById('scanPreviewImg').style.display='none';
+  document.getElementById('scanLoading').style.display='none';
+  document.getElementById('scanResult').style.display='none';
+  document.getElementById('scanError').style.display='none';
+  document.getElementById('scanApplyBtn').style.display='none';
+  document.getElementById('scanImgInput').value='';
+  scanResultData=[];
+}
+function closeScan(){document.getElementById('scanModal').classList.remove('open');}
+
+function handleScanImg(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const prev=document.getElementById('scanPreviewImg');
+    prev.src=e.target.result;prev.style.display='block';
+    document.getElementById('scanResult').style.display='none';
+    document.getElementById('scanError').style.display='none';
+    document.getElementById('scanApplyBtn').style.display='none';
+    analyzeScanImage(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeScanImage(dataUrl){
+  document.getElementById('scanLoading').style.display='flex';
+  const base64=dataUrl.split(',')[1];
+  const mediaType=dataUrl.split(';')[0].split(':')[1];
+  const productList=ALL.map(p=>p.name).join('、');
+  const prompt=`這是婕樂纖叫貨訂單截圖。請辨識所有商品名稱和數量。已知商品：${productList}。只回傳純 JSON，不要其他文字：{"items":[{"name":"商品名稱","qty":數量,"price":金額}]}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getScanApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mediaType,data:base64}},{type:'text',text:prompt}]}]})
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error?.message||'辨識失敗');
+    const clean=data.content[0].text.replace(/```json|```/g,'').trim();
+    scanResultData=(JSON.parse(clean).items)||[];
+    showScanResult();
+  }catch(e){
+    document.getElementById('scanLoading').style.display='none';
+    const el=document.getElementById('scanError');el.textContent='辨識失敗：'+e.message;el.style.display='block';
+  }
+}
+
+function showScanResult(){
+  document.getElementById('scanLoading').style.display='none';
+  if(!scanResultData.length){const el=document.getElementById('scanError');el.textContent='未辨識到商品，請換清晰截圖再試';el.style.display='block';return;}
+  document.getElementById('scanResultItems').innerHTML=scanResultData.map(it=>`<div class="scan-item-row"><span>${it.name}</span><span class="scan-item-qty">×${it.qty}</span></div>`).join('');
+  document.getElementById('scanResult').style.display='block';
+  document.getElementById('scanApplyBtn').style.display='block';
+}
+
+function applyScanResult(){
+  scanResultData.forEach(sr=>{
+    let idx=ALL.findIndex(p=>p.name===sr.name);
+    if(idx<0)idx=ALL.findIndex(p=>sr.name.includes(p.name.slice(0,3))||p.name.includes(sr.name.slice(0,3)));
+    const key=idx>=0?ALL[idx].name:sr.name;
+    if(idx>=0){cart[key]=(cart[key]||0)+(sr.qty||1);}
+  });
+  closeScan();renderGrid();renderCartPreview();
 }
 
 function openExport(){
