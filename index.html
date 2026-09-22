@@ -677,13 +677,13 @@ function renderEventList(){
   list.innerHTML=events.map(ev=>{
     const key='活動_'+ev.id;
     const qty=cart[key]||0;
-    const cost=ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
+    const cost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
     const itemStr=ev.items.map(i=>(i.gift?'🎁 ':'')+(i.name)+(i.qty>1?' ×'+i.qty:'')).join('、');
     return`<div class="event-card${qty>0?' has-qty':''}">
       <div class="event-card-name">${ev.name}${qty>0?` <span style="color:var(--mt-accent);font-size:13px">× ${qty}</span>`:''}</div>
       <div class="event-card-items">${itemStr}</div>
       <div class="event-card-price">NT$${Math.round(ev.price).toLocaleString()}</div>
-      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}（含贈品）　利潤 NT$${Math.round(ev.price-cost).toLocaleString()}</div>
+      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}　利潤 NT$${Math.round(ev.price-cost).toLocaleString()}</div>
       <div class="event-card-actions">
         <button class="event-qty-btn" onclick="removeEventFromCart(${ev.id})">－</button>
         <span class="event-qty">${qty}</span>
@@ -812,7 +812,7 @@ function updateSummary(){
     if(isEventKey){
       const eid=parseInt(key.slice(3));
       const ev=events.find(e=>e.id===eid);if(!ev)return;
-      const ecost=ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
+      const ecost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
       tR+=ev.price*qty;tP+=(ev.price-ecost)*qty;return;
     }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
@@ -844,7 +844,7 @@ function saveOrder(){
     if(isEventKey){
       const eid=parseInt(key.slice(3));
       const ev=events.find(e=>e.id===eid);if(!ev)return;
-      const ecost=ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
+      const ecost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
       const rev=ev.price*qty,profit=(ev.price-ecost)*qty;
       tR+=rev;tP+=profit;
       orderItems.push({name:'[活動] '+ev.name,qty,rev,profit,cost:ecost});return;
