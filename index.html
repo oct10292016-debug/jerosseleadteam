@@ -166,6 +166,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .event-prod-check input[type=checkbox]{width:18px;height:18px;accent-color:var(--mt-accent);flex-shrink:0}
 .event-prod-label{flex:1;font-size:13px;color:var(--mt-text)}
 .event-prod-qty{width:50px;padding:5px 8px;border:0.5px solid var(--mt-border);border-radius:8px;font-size:13px;text-align:center;outline:none;background:var(--mt-surface)}
+.event-gift-toggle{padding:4px 8px;border:0.5px solid var(--mt-border2);border-radius:6px;font-size:11px;cursor:pointer;background:var(--mt-surface);color:var(--mt-muted);white-space:nowrap}
+.event-gift-toggle.on{background:#F0F7F4;border-color:#4A7C59;color:#4A7C59;font-weight:500}
 .event-save-btn{width:100%;padding:13px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px}
 .event-save-btn:active{opacity:0.85}
 .event-cancel-btn{width:100%;padding:12px;background:var(--mt-surface2);color:var(--mt-muted);border:none;border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;margin-top:8px}
@@ -582,10 +584,12 @@ function openEventModal(id){
   const allProds=ALL.filter(p=>p.s!=='創業');
   prodList.innerHTML=allProds.map(p=>{
     const sel=ev?ev.items.find(i=>i.name===p.name):null;
+    const isGift=sel&&sel.gift;
     return`<div class="event-prod-check">
       <input type="checkbox" id="eprod_${p.name}" ${sel?'checked':''} onchange="toggleEventProd('${p.name}')">
       <label class="event-prod-label" for="eprod_${p.name}">${p.name}</label>
       <input class="event-prod-qty" type="number" id="eqty_${p.name}" value="${sel?sel.qty:1}" min="1" inputmode="numeric" style="${sel?'':'display:none'}">
+      <button class="event-gift-toggle${isGift?' on':''}" id="egift_${p.name}" style="${sel?'':'display:none'}" onclick="toggleEventGift('${p.name}')">${isGift?'贈品✓':'設贈品'}</button>
     </div>`;
   }).join('');
   document.getElementById('eventModal').classList.add('open');
@@ -594,8 +598,17 @@ function openEventModal(id){
 function toggleEventProd(name){
   const cb=document.getElementById('eprod_'+name);
   const qtyInput=document.getElementById('eqty_'+name);
+  const giftBtn=document.getElementById('egift_'+name);
   qtyInput.style.display=cb.checked?'':'none';
+  if(giftBtn)giftBtn.style.display=cb.checked?'':'none';
+  if(!cb.checked&&giftBtn){giftBtn.classList.remove('on');giftBtn.textContent='設贈品';}
   if(cb.checked)qtyInput.focus();
+}
+function toggleEventGift(name){
+  const btn=document.getElementById('egift_'+name);
+  if(!btn)return;
+  const isOn=btn.classList.toggle('on');
+  btn.textContent=isOn?'贈品✓':'設贈品';
 }
 
 function closeEventModal(){
@@ -614,7 +627,9 @@ function saveEventBundle(){
     const cb=document.getElementById('eprod_'+p.name);
     if(cb&&cb.checked){
       const qty=parseInt(document.getElementById('eqty_'+p.name).value)||1;
-      items.push({name:p.name,qty});
+      const giftBtn=document.getElementById('egift_'+p.name);
+      const gift=giftBtn&&giftBtn.classList.contains('on');
+      items.push({name:p.name,qty,gift});
     }
   });
   if(!items.length){alert('請至少選擇一個商品');return;}
@@ -663,12 +678,12 @@ function renderEventList(){
     const key='活動_'+ev.id;
     const qty=cart[key]||0;
     const cost=ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
-    const itemStr=ev.items.map(i=>i.name+(i.qty>1?' ×'+i.qty:'')).join('、');
+    const itemStr=ev.items.map(i=>(i.gift?'🎁 ':'')+(i.name)+(i.qty>1?' ×'+i.qty:'')).join('、');
     return`<div class="event-card${qty>0?' has-qty':''}">
       <div class="event-card-name">${ev.name}${qty>0?` <span style="color:var(--mt-accent);font-size:13px">× ${qty}</span>`:''}</div>
       <div class="event-card-items">${itemStr}</div>
       <div class="event-card-price">NT$${Math.round(ev.price).toLocaleString()}</div>
-      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}　利潤 NT$${Math.round(ev.price-cost).toLocaleString()}</div>
+      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}（含贈品）　利潤 NT$${Math.round(ev.price-cost).toLocaleString()}</div>
       <div class="event-card-actions">
         <button class="event-qty-btn" onclick="removeEventFromCart(${ev.id})">－</button>
         <span class="event-qty">${qty}</span>
@@ -821,7 +836,8 @@ function saveOrder(){
   const lv=getLevel(),pt=getSellType();
   const note=document.getElementById('orderNote').value.trim();
   let tR=0,tP=0;
-  const orderItems=items.map(([key,qty])=>{
+  const orderItems=[];
+  items.forEach(([key,qty])=>{
     const isGiftKey=key.startsWith('贈品_');
     const isBizKey=key.startsWith('創業_');
     const isEventKey=key.startsWith('活動_');
@@ -840,7 +856,7 @@ function saveOrder(){
     const sp=isGiftKey?0:(isBizKey?(p?p.fixed||p.retail[0]||0:0):(p?getSellPrice(p,pt):0));
     const rev=sp*qty,profit=(sp-cost)*qty;
     tR+=rev;tP+=profit;
-    return{name:displayName,qty,rev,profit,cost};
+    orderItems.push({name:displayName,qty,rev,profit,cost});
   });
   const now=new Date();
   const sellTypeVal=document.getElementById('sellType').value;
