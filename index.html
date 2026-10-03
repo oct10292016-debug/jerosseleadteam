@@ -572,7 +572,7 @@ function switchToProduct(s){
 
 function openEventModal(id){
   editingEventId=id;
-  const ev=id!=null?events.find(e=>e.id===id):null;
+  const ev=id!=null?events.find(e=>String(e.id)===String(id)):null;
   document.getElementById('eventModalTitle').textContent=ev?'編輯活動組合':'新增活動組合';
   document.getElementById('eventName').value=ev?ev.name:'';
   document.getElementById('eventPrice').value=ev?ev.price:'';
@@ -631,7 +631,7 @@ function saveEventBundle(){
   });
   if(!items.length){alert('請至少選擇一個商品');return;}
   if(editingEventId!=null){
-    const idx=events.findIndex(e=>e.id===editingEventId);
+    const idx=events.findIndex(e=>String(e.id)===String(editingEventId));
     if(idx>=0)events[idx]={...events[idx],name,price,items};
   } else {
     events.push({id:Date.now(),name,price,items});
@@ -643,15 +643,15 @@ function saveEventBundle(){
 
 function deleteEvent(id){
   if(!confirm('確定刪除此活動組合？'))return;
-  events=events.filter(e=>e.id!==id);
+  events=events.filter(e=>String(e.id)!==String(id));
   saveEvents();
   renderEventList();
 }
 
 function addEventToCart(id){
-  const ev=events.find(e=>e.id===id);
+  const ev=events.find(e=>String(e.id)===String(id));
   if(!ev)return;
-  const key='活動_'+id;
+  const key='活動_'+String(ev.id);
   cart[key]=(cart[key]||0)+1;
   renderEventList();
   renderCartPreview();
@@ -659,7 +659,7 @@ function addEventToCart(id){
 }
 
 function removeEventFromCart(id){
-  const key='活動_'+id;
+  const key='活動_'+String(id);
   if(cart[key]>0){cart[key]--;if(cart[key]===0)delete cart[key];}
   renderEventList();
   renderCartPreview();
@@ -672,7 +672,7 @@ function renderEventList(){
   if(!events.length){list.innerHTML='<div class="event-empty">尚無活動組合<br>點上方「新增」建立</div>';return;}
   const lv=getLevel();
   list.innerHTML=events.map(ev=>{
-    const key='活動_'+ev.id;
+    const key='活動_'+String(ev.id);
     const qty=cart[key]||0;
     const cost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
     const itemStr=ev.items.map(i=>(i.gift?'🎁 ':'')+(i.name)+(i.qty>1?' ×'+i.qty:'')).join('、');
@@ -681,13 +681,13 @@ function renderEventList(){
       <div class="event-card-items">${itemStr}</div>
       <div class="event-card-price">NT$${Math.round(parseFloat(ev.price)).toLocaleString()}</div>
       <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}　利潤 NT$${Math.round(parseFloat(ev.price)-cost).toLocaleString()}</div>
-      <button onclick="addEventToCart(${ev.id})" style="width:100%;padding:10px;margin-top:10px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer">＋ 加入購物車</button>
+      <button onclick="addEventToCart('${ev.id}')" style="width:100%;padding:10px;margin-top:10px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer">＋ 加入購物車</button>
       <div class="event-card-actions">
-        <button class="event-qty-btn" onclick="removeEventFromCart(${ev.id})">－</button>
+        <button class="event-qty-btn" onclick="removeEventFromCart('${ev.id}')">－</button>
         <span class="event-qty">${qty}</span>
-        <button class="event-qty-btn" onclick="addEventToCart(${ev.id})">＋</button>
-        <button class="event-edit-btn" onclick="openEventModal(${ev.id})">編輯</button>
-        <button class="event-del-btn" onclick="deleteEvent(${ev.id})">刪除</button>
+        <button class="event-qty-btn" onclick="addEventToCart('${ev.id}')">＋</button>
+        <button class="event-edit-btn" onclick="openEventModal('${ev.id}')">編輯</button>
+        <button class="event-del-btn" onclick="deleteEvent('${ev.id}')">刪除</button>
       </div>
     </div>`;
   }).join('');
@@ -808,8 +808,8 @@ function updateSummary(){
     const isBizKey=key.startsWith('創業_');
     const isEventKey=key.startsWith('活動_');
     if(isEventKey){
-      const eid=parseInt(key.slice(3));
-      const ev=events.find(e=>e.id===eid);
+      const eid=key.slice(3);
+      const ev=events.find(e=>String(e.id)===eid);
       if(!ev)return;
       const evPrice=parseFloat(ev.price)||0;
       const ecost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
@@ -1126,6 +1126,7 @@ function renderManualList(){
 }
 
 function previewReceipt(){
+  events=JSON.parse(localStorage.getItem('jerosse-events')||'[]');
   const items=Object.entries(cart).filter(([,q])=>q>0);
   if(!items.length){alert('請先選擇商品');return;}
   const lv=getLevel(),pt=getSellType();
