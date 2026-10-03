@@ -1155,12 +1155,16 @@ function previewReceipt(){
       const lineTotal=evPrice*qty;
       total+=lineTotal;
       totalQty+=qty;
-      return`<div class="receipt-item">
-        <div class="receipt-item-name">[活動] ${evName}</div>
-        <div class="receipt-item-origin">—</div>
-        <div class="receipt-item-unit" style="color:var(--mt-accent)">${fmt(evPrice)}</div>
-        <div class="receipt-item-qty">×${qty}</div>
-        <div class="receipt-item-price">${fmt(lineTotal)}</div>
+      const evItemsStr=ev?ev.items.map(i=>(i.gift?'🎁 ':'')+i.name+(i.qty>1?' ×'+i.qty:'')).join('、'):'';
+      return`<div class="receipt-item" style="flex-direction:column;align-items:flex-start;gap:2px">
+        <div style="display:grid;grid-template-columns:minmax(0,2fr) 60px 60px 36px 70px;gap:4px;width:100%;align-items:center">
+          <div class="receipt-item-name">[活動] ${evName}</div>
+          <div class="receipt-item-origin">—</div>
+          <div class="receipt-item-unit" style="color:var(--mt-accent)">${fmt(evPrice)}</div>
+          <div class="receipt-item-qty">×${qty}</div>
+          <div class="receipt-item-price">${fmt(lineTotal)}</div>
+        </div>
+        ${evItemsStr?`<div style="font-size:11px;color:var(--mt-hint);padding-left:2px;line-height:1.5">${evItemsStr}</div>`:''}
       </div>`;
     }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
