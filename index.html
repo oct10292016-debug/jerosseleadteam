@@ -262,8 +262,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="header-row">
       <span class="app-title">婕樂纖</span>
       <select class="level-select" id="myLevel" onchange="renderGrid()">
-        <option value="皇家輔導" selected>皇家輔導</option>
-        <option value="一級輔導">一級輔導</option>
         <option value="二級輔導">二級輔導</option>
         <option value="三級輔導">三級輔導</option>
         <option value="三級零售">三級零售</option>
@@ -274,7 +272,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <option value="r1">售：任兩盒</option>
         <option value="r2">售：VIP價</option>
         <option disabled>── 售：進貨價 ──</option>
-        <option value="c_一級輔導">售：一級進貨</option>
         <option value="c_二級輔導">售：二級進貨</option>
         <option value="c_三級輔導">售：三級輔進貨</option>
         <option value="c_三級零售">售：三級零進貨</option>
@@ -812,53 +809,11 @@ function updateSummary(){
     const isEventKey=key.startsWith('活動_');
     if(isEventKey){
       const eid=parseInt(key.slice(3));
-      const ev=events.find(e=>e.id===eid);if(!ev)return '';
+      const ev=events.find(e=>e.id===eid);
+      if(!ev)return;
+      const evPrice=parseFloat(ev.price)||0;
       const ecost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
-      const lineTotal=parseFloat(ev.price)*qty;
-      total+=lineTotal;
-      totalQty+=qty;
-      tR+=lineTotal;tP+=(parseFloat(ev.price)-ecost)*qty;
-      return`<div class="receipt-item">
-        <div class="receipt-item-name">[活動] ${ev.name}</div>
-        <div class="receipt-item-origin">—</div>
-        <div class="receipt-item-unit" style="color:var(--mt-accent)">${fmt(ev.price)}</div>
-        <div class="receipt-item-qty">×${qty}</div>
-        <div class="receipt-item-price">${fmt(lineTotal)}</div>
-      </div>`;
-    }
-    const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
-    const p=ALL.find(x=>x.name===name);if(!p)return;
-    const cost=isGiftKey||isBizKey?0:(p.costs[lv]||0);
-    const sp=isGiftKey?0:(isBizKey?(p.fixed||p.retail[0]||0):getSellPrice(p,pt));
-    tR+=sp*qty;tP+=(sp-cost)*qty;
-  });
-  const avg=tR>0?tP/tR*100:null;
-  document.getElementById('sumRev').textContent=fmt(tR);
-  const pe=document.getElementById('sumProfit');
-  pe.textContent=fmt(tP);pe.className='sum-val '+(tP>=0?'c-green':'c-red');
-  const me=document.getElementById('sumMargin');
-  me.textContent=avg!==null?avg.toFixed(1)+'%':'—';
-  me.className='sum-val '+(avg===null?'c-muted':avg>=0?'c-green':'c-red');
-}
-
-function saveOrder(){
-  const items=Object.entries(cart).filter(([,q])=>q>0);
-  if(!items.length){alert('請先選擇商品');return;}
-  const lv=getLevel(),pt=getSellType();
-  const note=document.getElementById('orderNote').value.trim();
-  let tR=0,tP=0;
-  const orderItems=[];
-  items.forEach(([key,qty])=>{
-    const isGiftKey=key.startsWith('贈品_');
-    const isBizKey=key.startsWith('創業_');
-    const isEventKey=key.startsWith('活動_');
-    if(isEventKey){
-      const eid=parseInt(key.slice(3));
-      const ev=events.find(e=>e.id===eid);if(!ev)return;
-      const ecost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
-      const rev=ev.price*qty,profit=(ev.price-ecost)*qty;
-      tR+=rev;tP+=profit;
-      orderItems.push({name:'[活動] '+ev.name,qty,rev,profit,cost:ecost});return;
+      tR+=evPrice*qty;tP+=(evPrice-ecost)*qty;return;
     }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
     const displayName=isGiftKey?'[贈品] '+name:(isBizKey?'[創業] '+name:name);
