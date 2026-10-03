@@ -744,27 +744,29 @@ function renderGrid(){
 function addToCart(idx){
   const p=ALL[idx];
   cart[p.name]=(cart[p.name]||0)+1;
-  renderGrid();renderCartPreview();
+  renderGrid();renderCartPreview();updateSummary();
 }
 function addToCartByKey(idx,key){
-  cart[key]=(cart[key]||0)+1;
-  renderGrid();renderCartPreview();
+  cart[key]=(Math.max(0,cart[key]||0))+1;
+  renderGrid();renderCartPreview();updateSummary();
 }
 function removeFromCart(e,idx){
   if(e&&e.preventDefault)e.preventDefault();
   const p=ALL[idx];
-  if(cart[p.name]>0){cart[p.name]--;if(cart[p.name]===0)delete cart[p.name];}
-  renderGrid();renderCartPreview();
+  if(cart[p.name]>1){cart[p.name]--;}
+  else{delete cart[p.name];}
+  renderGrid();renderCartPreview();updateSummary();
 }
 function setCartQty(key,val){
   const n=parseInt(val);
   if(isNaN(n)||n<=0){delete cart[key];}
   else{cart[key]=n;}
-  renderGrid();renderCartPreview();
+  renderGrid();renderCartPreview();updateSummary();
 }
 function removeFromCartByKey(key){
-  if(cart[key]>0){cart[key]--;if(cart[key]===0)delete cart[key];}
-  renderGrid();renderCartPreview();
+  if(cart[key]>1){cart[key]--;}
+  else{delete cart[key];}
+  renderGrid();renderCartPreview();updateSummary();
 }
 
 function clearCart(){
