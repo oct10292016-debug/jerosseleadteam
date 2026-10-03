@@ -812,22 +812,61 @@ function updateSummary(){
     const isBizKey=key.startsWith('創業_');
     const isEventKey=key.startsWith('活動_');
     if(isEventKey){
-      // key 格式：活動_id::name::price 或 活動_id（舊格式）
       const parts=key.split('::');
       const eid=parts[0].slice(3);
-      const ev=events.find(e=>String(e.id)===eid);
+      const ev=events.find(e=>String(e.id)===String(eid));
       const evPrice=ev?parseFloat(ev.price)||0:(parts[2]?parseFloat(parts[2])||0:0);
       const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
       tR+=evPrice*qty;tP+=(evPrice-ecost)*qty;return;
+    }
+    const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
+    const p=ALL.find(x=>x.name===name);if(!p&&!isBizKey&&!isGiftKey)return;
+    const cost=isGiftKey||isBizKey?0:(p?p.costs[lv]||0:0);
+    const sp=isGiftKey?0:(isBizKey?(p?p.fixed||p.retail[0]||0:0):(p?getSellPrice(p,pt):0));
+    tR+=sp*qty;tP+=(sp-cost)*qty;
+  });
+  const avg=tR>0?tP/tR*100:null;
+  document.getElementById('sumRev').textContent=fmt(tR);
+  const pe=document.getElementById('sumProfit');
+  pe.textContent=fmt(tP);pe.className='sum-val '+(tP>=0?'c-green':'c-red');
+  const me=document.getElementById('sumMargin');
+  me.textContent=avg!==null?avg.toFixed(1)+'%':'—';
+  me.className='sum-val '+(avg===null?'c-muted':avg>=0?'c-green':'c-red');
+}
+
+function saveOrder(){
+  const items=Object.entries(cart).filter(([,q])=>q>0);
+  if(!items.length){alert('請先選擇商品');return;}
+  const lv=getLevel(),pt=getSellType();
+  const note=document.getElementById('orderNote').value.trim();
+  let tR=0,tP=0;
+  const orderItems=[];
+  items.forEach(([key,qty])=>{
+    const isGiftKey=key.startsWith('贈品_');
+    const isBizKey=key.startsWith('創業_');
+    const isEventKey=key.startsWith('活動_');
+    if(isEventKey){
+      const parts=key.split('::');
+      const eid=parts[0].slice(3);
+      const ev=events.find(e=>String(e.id)===String(eid));
+      const evName=ev?ev.name:(parts.length>=2?parts[1]:'活動組合');
+      const evPrice=ev?(parseFloat(ev.price)||0):(parts.length>=3?parseFloat(parts[2])||0:0);
+      const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
+      const rev=evPrice*qty,profit=(evPrice-ecost)*qty;
+      tR+=rev;tP+=profit;
+      orderItems.push({name:'[活動] '+evName,qty,rev,profit,cost:ecost});return;
     }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
     const displayName=isGiftKey?'[贈品] '+name:(isBizKey?'[創業] '+name:name);
     const p=ALL.find(x=>x.name===name);
     const cost=isGiftKey||isBizKey?0:(p?p.costs[lv]||0:0);
     const sp=isGiftKey?0:(isBizKey?(p?p.fixed||p.retail[0]||0:0):(p?getSellPrice(p,pt):0));
-    const rev=sp*qty,profit=(sp-cost)*qty;
-    tR+=rev;tP+=profit;
-    orderItems.push({name:displayName,qty,rev,profit,cost});
+    const isFreight=isBizKey&&sp<0;
+    const rev=isFreight?Math.abs(sp)*qty:sp*qty;
+    const profit=isFreight?0:(sp-cost)*qty;
+    tR+=isFreight?Math.abs(sp)*qty:sp*qty;
+    tP+=(sp-cost)*qty;
+    orderItems.push({name:displayName,qty,rev:sp*qty,profit:(sp-cost)*qty,cost});
   });
   const now=new Date();
   const sellTypeVal=document.getElementById('sellType').value;
@@ -841,7 +880,6 @@ function updateSummary(){
   clearCart();
   alert('訂單已儲存！');
 }
-
 function switchTab(t){
   ['pos','stats'].forEach(id=>{
     const pg=document.getElementById('page-'+id);
