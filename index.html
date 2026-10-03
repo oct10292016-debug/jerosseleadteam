@@ -682,8 +682,9 @@ function renderEventList(){
     return`<div class="event-card${qty>0?' has-qty':''}">
       <div class="event-card-name">${ev.name}${qty>0?` <span style="color:var(--mt-accent);font-size:13px">× ${qty}</span>`:''}</div>
       <div class="event-card-items">${itemStr}</div>
-      <div class="event-card-price">NT$${Math.round(ev.price).toLocaleString()}</div>
-      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}　利潤 NT$${Math.round(ev.price-cost).toLocaleString()}</div>
+      <div class="event-card-price">NT$${Math.round(parseFloat(ev.price)).toLocaleString()}</div>
+      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}　利潤 NT$${Math.round(parseFloat(ev.price)-cost).toLocaleString()}</div>
+      <button onclick="addEventToCart(${ev.id})" style="width:100%;padding:10px;margin-top:10px;background:var(--mt-accent);color:#FAF6F1;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer">＋ 加入購物車</button>
       <div class="event-card-actions">
         <button class="event-qty-btn" onclick="removeEventFromCart(${ev.id})">－</button>
         <span class="event-qty">${qty}</span>
@@ -811,9 +812,19 @@ function updateSummary(){
     const isEventKey=key.startsWith('活動_');
     if(isEventKey){
       const eid=parseInt(key.slice(3));
-      const ev=events.find(e=>e.id===eid);if(!ev)return;
+      const ev=events.find(e=>e.id===eid);if(!ev)return '';
       const ecost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
-      tR+=ev.price*qty;tP+=(ev.price-ecost)*qty;return;
+      const lineTotal=parseFloat(ev.price)*qty;
+      total+=lineTotal;
+      totalQty+=qty;
+      tR+=lineTotal;tP+=(parseFloat(ev.price)-ecost)*qty;
+      return`<div class="receipt-item">
+        <div class="receipt-item-name">[活動] ${ev.name}</div>
+        <div class="receipt-item-origin">—</div>
+        <div class="receipt-item-unit" style="color:var(--mt-accent)">${fmt(ev.price)}</div>
+        <div class="receipt-item-qty">×${qty}</div>
+        <div class="receipt-item-price">${fmt(lineTotal)}</div>
+      </div>`;
     }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
     const p=ALL.find(x=>x.name===name);if(!p)return;
@@ -877,7 +888,7 @@ function switchTab(t){
     pg.style.display=id===t?'flex':'none';
     document.getElementById('nav-'+id).classList.toggle('active',id===t);
   });
-  if(t==='stats')renderStats();
+  if(t==='stats'){renderStats();renderStockSummary();}
 }
 
 function setPeriod(p){
@@ -968,6 +979,7 @@ function switchStatsTab(tab){
   document.getElementById('stats-overview').style.display=tab==='overview'?'block':'none';
   document.getElementById('stats-products').style.display=tab==='products'?'block':'none';
   if(tab==='products')renderProductStats();
+  if(tab==='overview')renderStockSummary();
 }
 
 function setProdPeriod(p){
