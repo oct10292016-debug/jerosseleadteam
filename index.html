@@ -651,7 +651,7 @@ function deleteEvent(id){
 function addEventToCart(id){
   const ev=events.find(e=>String(e.id)===String(id));
   if(!ev)return;
-  const key='活動_'+String(ev.id);
+  const key='活動_'+String(ev.id)+'::'+ev.name+'::'+parseFloat(ev.price);
   cart[key]=(cart[key]||0)+1;
   renderEventList();
   renderCartPreview();
@@ -659,8 +659,10 @@ function addEventToCart(id){
 }
 
 function removeEventFromCart(id){
-  const key='活動_'+String(id);
-  if(cart[key]>0){cart[key]--;if(cart[key]===0)delete cart[key];}
+  // 找到對應的 key（格式 活動_id::name::price）
+  const prefix='活動_'+String(id)+'::';
+  const key=Object.keys(cart).find(k=>k.startsWith(prefix));
+  if(key&&cart[key]>0){cart[key]--;if(cart[key]===0)delete cart[key];}
   renderEventList();
   renderCartPreview();
   updateSummary();
@@ -672,8 +674,9 @@ function renderEventList(){
   if(!events.length){list.innerHTML='<div class="event-empty">尚無活動組合<br>點上方「新增」建立</div>';return;}
   const lv=getLevel();
   list.innerHTML=events.map(ev=>{
-    const key='活動_'+String(ev.id);
-    const qty=cart[key]||0;
+    const prefix='活動_'+String(ev.id)+'::';
+    const evKey=Object.keys(cart).find(k=>k.startsWith(prefix))||('活動_'+String(ev.id)+'::'+ev.name+'::'+parseFloat(ev.price));
+    const qty=cart[evKey]||0;
     const cost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
     const itemStr=ev.items.map(i=>(i.gift?'🎁 ':'')+(i.name)+(i.qty>1?' ×'+i.qty:'')).join('、');
     return`<div class="event-card${qty>0?' has-qty':''}">
@@ -808,11 +811,12 @@ function updateSummary(){
     const isBizKey=key.startsWith('創業_');
     const isEventKey=key.startsWith('活動_');
     if(isEventKey){
-      const eid=key.slice(3);
+      // key 格式：活動_id::name::price 或 活動_id（舊格式）
+      const parts=key.split('::');
+      const eid=parts[0].slice(3);
       const ev=events.find(e=>String(e.id)===eid);
-      if(!ev)return;
-      const evPrice=parseFloat(ev.price)||0;
-      const ecost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
+      const evPrice=ev?parseFloat(ev.price)||0:(parts[2]?parseFloat(parts[2])||0:0);
+      const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
       tR+=evPrice*qty;tP+=(evPrice-ecost)*qty;return;
     }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
@@ -1127,6 +1131,15 @@ function renderManualList(){
 
 function previewReceipt(){
   events=JSON.parse(localStorage.getItem('jerosse-events')||'[]');
+  const allCartItems=Object.entries(cart).filter(([,q])=>q>0);
+  // 清掉找不到的活動 key
+  allCartItems.forEach(([key])=>{
+    if(key.startsWith('活動_')){
+      const eid=key.slice(3);
+      const ev=events.find(e=>String(e.id)===eid);
+      if(!ev)delete cart[key];
+    }
+  });
   const items=Object.entries(cart).filter(([,q])=>q>0);
   if(!items.length){alert('請先選擇商品');return;}
   const lv=getLevel(),pt=getSellType();
