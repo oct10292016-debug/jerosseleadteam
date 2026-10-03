@@ -1132,15 +1132,6 @@ function renderManualList(){
 
 function previewReceipt(){
   events=JSON.parse(localStorage.getItem('jerosse-events')||'[]');
-  const allCartItems=Object.entries(cart).filter(([,q])=>q>0);
-  // 清掉找不到的活動 key
-  allCartItems.forEach(([key])=>{
-    if(key.startsWith('活動_')){
-      const eid=key.slice(3);
-      const ev=events.find(e=>String(e.id)===eid);
-      if(!ev)delete cart[key];
-    }
-  });
   const items=Object.entries(cart).filter(([,q])=>q>0);
   if(!items.length){alert('請先選擇商品');return;}
   const lv=getLevel(),pt=getSellType();
@@ -1152,6 +1143,26 @@ function previewReceipt(){
   const rowsHtml=items.map(([key,qty])=>{
     const isGiftKey=key.startsWith('贈品_');
     const isBizKey=key.startsWith('創業_');
+    const isEventKey=key.startsWith('活動_');
+    if(isEventKey){
+      const parts=key.split('::');
+      const eid=parts[0].slice(3);
+      const ev=events.find(e=>String(e.id)===String(eid));
+      const evName=ev?ev.name:(parts.length>=2?parts[1]:'活動組合');
+      const evPrice=ev?(parseFloat(ev.price)||0):(parts.length>=3?parseFloat(parts[2])||0:0);
+      if(!evName&&!evPrice)return '';
+      const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
+      const lineTotal=evPrice*qty;
+      total+=lineTotal;
+      totalQty+=qty;
+      return`<div class="receipt-item">
+        <div class="receipt-item-name">[活動] ${evName}</div>
+        <div class="receipt-item-origin">—</div>
+        <div class="receipt-item-unit" style="color:var(--mt-accent)">${fmt(evPrice)}</div>
+        <div class="receipt-item-qty">×${qty}</div>
+        <div class="receipt-item-price">${fmt(lineTotal)}</div>
+      </div>`;
+    }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
     const displayName=isGiftKey?'[贈品] '+name:name;
     const p=ALL.find(x=>x.name===name);
