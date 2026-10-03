@@ -280,9 +280,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
   </div>
 
-  <div class="tab-bar" id="tabBar">
-    <button class="series-tab" id="tab-event" onclick="switchToEvent()">活動</button>
-  </div>
+  <div class="tab-bar" id="tabBar"></div>
 
   <div class="grid-area" id="gridArea">
     <div class="product-grid" id="productGrid"></div>
@@ -787,7 +785,7 @@ function renderCartPreview(){
     const isGiftKey=key.startsWith('贈品_');
     const isBizKey=key.startsWith('創業_');
     const isEventKey=key.startsWith('活動_');
-    const label=isEventKey?'[活動] '+(events.find(e=>e.id===parseInt(key.slice(3)))||{name:key}).name:(isGiftKey?'[贈品] '+key.slice(3):(isBizKey?'[創業] '+key.slice(3):key));
+    const label=isEventKey?(()=>{const parts=key.split('::');const eid=parts[0].slice(3);const ev=events.find(e=>String(e.id)===eid);return '[活動] '+(ev?ev.name:(parts[1]||'活動組合'));})():(isGiftKey?'[贈品] '+key.slice(3):(isBizKey?'[創業] '+key.slice(3):key));
     const safeKey=key.replace(/'/g,"\\'");
     return`<div class="cart-row">
       <span class="cart-row-name">${label}</span>
@@ -1156,15 +1154,12 @@ function previewReceipt(){
       total+=lineTotal;
       totalQty+=qty;
       const evItemsStr=ev?ev.items.map(i=>(i.gift?'🎁 ':'')+i.name+(i.qty>1?' ×'+i.qty:'')).join('、'):'';
-      return`<div class="receipt-item" style="flex-direction:column;align-items:flex-start;gap:2px">
-        <div style="display:grid;grid-template-columns:minmax(0,2fr) 60px 60px 36px 70px;gap:4px;width:100%;align-items:center">
-          <div class="receipt-item-name">[活動] ${evName}</div>
-          <div class="receipt-item-origin">—</div>
-          <div class="receipt-item-unit" style="color:var(--mt-accent)">${fmt(evPrice)}</div>
-          <div class="receipt-item-qty">×${qty}</div>
-          <div class="receipt-item-price">${fmt(lineTotal)}</div>
-        </div>
-        ${evItemsStr?`<div style="font-size:11px;color:var(--mt-hint);padding-left:2px;line-height:1.5">${evItemsStr}</div>`:''}
+      return`<div class="receipt-item" style="flex-wrap:wrap;align-items:center">
+        <div class="receipt-item-name" style="min-width:100%">[活動] ${evName}${evItemsStr?`<div style="font-size:11px;color:var(--mt-hint);font-weight:400;margin-top:2px;white-space:normal;line-height:1.5">${evItemsStr}</div>`:''}</div>
+        <div class="receipt-item-origin" style="margin-top:4px">—</div>
+        <div class="receipt-item-unit" style="color:var(--mt-accent);margin-top:4px">${fmt(evPrice)}</div>
+        <div class="receipt-item-qty" style="margin-top:4px">×${qty}</div>
+        <div class="receipt-item-price" style="margin-top:4px">${fmt(lineTotal)}</div>
       </div>`;
     }
     const name=isGiftKey?key.slice(3):(isBizKey?key.slice(3):key);
