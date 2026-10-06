@@ -1193,6 +1193,12 @@ function previewReceipt(){
       const lineTotal=evPrice*qty;
       total+=lineTotal;
       totalQty+=qty;
+      // 計算活動省下：所有商品原價（含贈品原價）加總 - 活動價
+      if(ev){
+        const evOrigin=ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p?p.retail[0]||0:0)*i.qty;},0);
+        totalOrigin+=evOrigin*qty;
+        totalSaved+=(evOrigin-evPrice)*qty;
+      }
       const evItemsStr=ev?ev.items.map(i=>(i.gift?'🎁 ':'')+i.name+(i.qty>1?' ×'+i.qty:'')).join('、'):'';
       return`<div class="receipt-item" style="flex-wrap:wrap;align-items:center">
         <div class="receipt-item-name" style="min-width:100%">[活動] ${evName}${evItemsStr?`<div style="font-size:11px;color:var(--mt-hint);font-weight:400;margin-top:2px;white-space:normal;line-height:1.5">${evItemsStr}</div>`:''}</div>
