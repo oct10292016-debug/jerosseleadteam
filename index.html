@@ -261,7 +261,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <div class="header">
     <div class="header-row">
       <span class="app-title">婕樂纖</span>
-      <select class="level-select" id="myLevel" onchange="renderGrid()">
+      <select class="level-select" id="myLevel" onchange="renderGrid();renderEventList()">
         <option value="二級輔導">二級輔導</option>
         <option value="三級輔導">三級輔導</option>
         <option value="三級零售">三級零售</option>
@@ -633,6 +633,7 @@ function closeEventModal(){
 }
 
 function calcEventPrice(items){
+  // 活動售價固定 = 非贈品商品的 VIP 價（retail[2]）× 數量加總
   let total=0;
   items.forEach(item=>{
     if(item.gift)return;
@@ -693,7 +694,9 @@ function deleteEvent(id){
 function addEventToCart(id){
   const ev=events.find(e=>String(e.id)===String(id));
   if(!ev)return;
-  const key='活動_'+String(ev.id)+'::'+ev.name+'::'+parseFloat(ev.price);
+  // 加入購物車時用即時計算的售價（依右邊選單）
+  const evPrice=calcEventPrice(ev.items);
+  const key='活動_'+String(ev.id)+'::'+ev.name+'::'+evPrice;
   cart[key]=(cart[key]||0)+1;
   renderEventList();
   renderCartPreview();
@@ -717,15 +720,16 @@ function renderEventList(){
   const lv=getLevel();
   list.innerHTML=events.map(ev=>{
     const prefix='活動_'+String(ev.id)+'::';
-    const evKey=Object.keys(cart).find(k=>k.startsWith(prefix))||('活動_'+String(ev.id)+'::'+ev.name+'::'+parseFloat(ev.price));
+    const evPrice=calcEventPrice(ev.items);
+    const evKey=Object.keys(cart).find(k=>k.startsWith(prefix))||('活動_'+String(ev.id)+'::'+ev.name+'::'+evPrice);
     const qty=cart[evKey]||0;
     const cost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
     const itemStr=ev.items.map(i=>(i.gift?'🎁 ':'')+(i.name)+(i.qty>1?' ×'+i.qty:'')).join('、');
     return`<div class="event-card${qty>0?' has-qty':''}">
       <div class="event-card-name">${ev.name}${qty>0?` <span style="color:var(--mt-accent);font-size:13px">× ${qty}</span>`:''}</div>
       <div class="event-card-items">${itemStr}</div>
-      <div class="event-card-price">NT$${Math.round(parseFloat(ev.price)).toLocaleString()}</div>
-      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}　利潤 NT$${Math.round(parseFloat(ev.price)-cost).toLocaleString()}</div>
+      <div class="event-card-price">NT$${Math.round(evPrice).toLocaleString()}</div>
+      <div class="event-card-cost">進貨成本 NT$${Math.round(cost).toLocaleString()}　利潤 NT$${Math.round(evPrice-cost).toLocaleString()}</div>
       <div class="event-card-actions">
         <button class="event-qty-btn" onclick="removeEventFromCart('${ev.id}')">－</button>
         <span class="event-qty">${qty}</span>
@@ -859,7 +863,7 @@ function updateSummary(){
       const parts=key.split('::');
       const eid=parts[0].slice(3);
       const ev=events.find(e=>String(e.id)===String(eid));
-      const evPrice=ev?parseFloat(ev.price)||0:(parts[2]?parseFloat(parts[2])||0:0);
+      const evPrice=ev?calcEventPrice(ev.items):(parts[2]?parseFloat(parts[2])||0:0);
       const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
       tR+=evPrice*qty;tP+=(evPrice-ecost)*qty;return;
     }
@@ -894,7 +898,7 @@ function saveOrder(){
       const eid=parts[0].slice(3);
       const ev=events.find(e=>String(e.id)===String(eid));
       const evName=ev?ev.name:(parts.length>=2?parts[1]:'活動組合');
-      const evPrice=ev?(parseFloat(ev.price)||0):(parts.length>=3?parseFloat(parts[2])||0:0);
+      const evPrice=ev?calcEventPrice(ev.items):(parts.length>=3?parseFloat(parts[2])||0:0);
       const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
       const rev=evPrice*qty,profit=(evPrice-ecost)*qty;
       tR+=rev;tP+=profit;
@@ -1119,13 +1123,33 @@ function showHistReceipt(id){
   const rowsHtml=o.items.map(item=>{
     const isGift=item.name.startsWith('[贈品]');
     const isBiz=item.name.startsWith('[創業]');
-    const displayName=item.name.replace('[贈品] ','').replace('[創業] ','');
+    const isEv=item.name.startsWith('[活動]');
+    const displayName=item.name.replace('[贈品] ','').replace('[創業] ','').replace('[活動] ','');
+    totalQty+=item.qty;
+    if(isEv){
+      const sp=item.qty>0?Math.round(item.rev/item.qty):0;
+      // 嘗試從 events 找回活動細節
+      const ev=events.find(e=>e.name===displayName);
+      const evItemsStr=ev?ev.items.map(i=>(i.gift?'🎁 ':'')+i.name+(i.qty>1?' ×'+i.qty:'')).join('、'):'';
+      const evOriginUnit=ev?ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p&&p.retail&&p.retail[0]!=null?p.retail[0]:0)*i.qty;},0):0;
+      const showOrigin=evOriginUnit>sp;
+      if(showOrigin){totalOrigin+=evOriginUnit*item.qty;totalSaved+=(evOriginUnit-sp)*item.qty;}
+      return`<div class="receipt-item" style="flex-wrap:wrap;align-items:center">
+        <div class="receipt-item-name" style="min-width:100%">[活動] ${displayName}${evItemsStr?`<div style="font-size:11px;color:var(--mt-hint);font-weight:400;margin-top:2px;white-space:normal;line-height:1.5">${evItemsStr}</div>`:''}</div>
+        <div class="receipt-item-origin" style="margin-top:4px;${showOrigin?'text-decoration:line-through;color:var(--mt-hint)':''}">${showOrigin?fmt(evOriginUnit):'—'}</div>
+        <div class="receipt-item-unit" style="color:var(--mt-accent);margin-top:4px">${fmt(sp)}</div>
+        <div class="receipt-item-qty" style="margin-top:4px">×${item.qty}</div>
+        <div class="receipt-item-price" style="margin-top:4px">${fmt(item.rev)}</div>
+      </div>`;
+    }
     const sp=item.qty>0?Math.round(item.rev/item.qty):0;
     const p=ALL.find(x=>x.name===displayName);
     const originPrice=p?(p.retail[0]||p.retail.find(x=>x!=null)||sp):sp;
     const lineOrigin=originPrice*item.qty;
-    totalQty+=item.qty;
-    if(!isGift&&!isBiz){totalOrigin+=lineOrigin;totalSaved+=(lineOrigin-item.rev);}
+    if(isGift){
+      const giftOrigin=(p&&p.retail&&p.retail[0]!=null?p.retail[0]:0)*item.qty;
+      totalOrigin+=giftOrigin; totalSaved+=giftOrigin;
+    } else if(!isBiz){totalOrigin+=lineOrigin;totalSaved+=(lineOrigin-item.rev);}
     return`<div class="receipt-item">
       <div class="receipt-item-name">${displayName}</div>
       <div class="receipt-item-origin" style="color:var(--mt-hint);text-decoration:${(!isGift&&!isBiz&&sp<originPrice)?'line-through':'none'}">${isGift||isBiz?'—':fmt(originPrice)}</div>
@@ -1231,7 +1255,7 @@ function previewReceipt(){
       const eid=parts[0].slice(3);
       const ev=events.find(e=>String(e.id)===String(eid));
       const evName=ev?ev.name:(parts.length>=2?parts[1]:'活動組合');
-      const evPrice=ev?(parseFloat(ev.price)||0):(parts.length>=3?parseFloat(parts[2])||0:0);
+      const evPrice=ev?calcEventPrice(ev.items):(parts.length>=3?parseFloat(parts[2])||0:0);
       if(!evName&&!evPrice)return '';
       const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
       const lineTotal=evPrice*qty;
@@ -1244,9 +1268,13 @@ function previewReceipt(){
         totalSaved+=(evOrigin-evPrice)*qty;
       }
       const evItemsStr=ev?ev.items.map(i=>(i.gift?'🎁 ':'')+i.name+(i.qty>1?' ×'+i.qty:'')).join('、'):'';
+      // 計算活動原價加總（供單據顯示劃線）
+      const evOriginUnit=ev?ev.items.reduce((s,i)=>{const p=ALL.find(x=>x.name===i.name);return s+(p&&p.retail&&p.retail[0]!=null?p.retail[0]:0)*i.qty;},0):0;
+      const showOrigin=evOriginUnit>evPrice;
+      const evProfit=(evPrice-ecost)*qty;
       return`<div class="receipt-item" style="flex-wrap:wrap;align-items:center">
         <div class="receipt-item-name" style="min-width:100%">[活動] ${evName}${evItemsStr?`<div style="font-size:11px;color:var(--mt-hint);font-weight:400;margin-top:2px;white-space:normal;line-height:1.5">${evItemsStr}</div>`:''}</div>
-        <div class="receipt-item-origin" style="margin-top:4px">—</div>
+        <div class="receipt-item-origin" style="margin-top:4px;${showOrigin?'text-decoration:line-through;color:var(--mt-hint)':''}">${showOrigin?fmt(evOriginUnit):'—'}</div>
         <div class="receipt-item-unit" style="color:var(--mt-accent);margin-top:4px">${fmt(evPrice)}</div>
         <div class="receipt-item-qty" style="margin-top:4px">×${qty}</div>
         <div class="receipt-item-price" style="margin-top:4px">${fmt(lineTotal)}</div>
@@ -1262,7 +1290,11 @@ function previewReceipt(){
     const isFreight=isBizKey&&sp<0;
     if(isFreight){total+=Math.abs(lineTotal);}else{total+=lineTotal;}
     totalQty+=qty;
-    if(!isGiftKey&&!isBizKey){ totalOrigin+=lineOrigin; totalSaved+=(lineOrigin-lineTotal); }
+    if(isGiftKey){
+      // 贈品：原價算進省下，售價=0
+      const giftOrigin=(p&&p.retail&&p.retail[0]!=null?p.retail[0]:0)*qty;
+      totalOrigin+=giftOrigin; totalSaved+=giftOrigin;
+    } else if(!isBizKey){ totalOrigin+=lineOrigin; totalSaved+=(lineOrigin-lineTotal); }
     if(isGiftKey) return`<div class="receipt-item">
       <div class="receipt-item-name">${displayName}</div>
       <div class="receipt-item-origin">—</div>
