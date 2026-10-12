@@ -418,10 +418,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="event-modal-title" id="eventModalTitle">新增活動組合</div>
     <div class="event-field-label">組合名稱</div>
     <input class="event-field" id="eventName" type="text" placeholder="例：4月活動組合">
-    <div class="event-field-label">活動總價（NT$）</div>
-    <input class="event-field" id="eventPrice" type="number" placeholder="例：2800" inputmode="numeric">
-    <div class="event-field-label">包含商品（選擇並設定數量）</div>
+    <div class="event-field-label">包含商品（選擇並設定數量，贈品不計入價格）</div>
     <div id="eventProdList"></div>
+    <div id="eventPricePreview" style="text-align:center;padding:10px 0;font-size:15px;color:var(--mt-accent);font-weight:600;display:none">活動售價：NT$<span id="eventPriceAmt">0</span>（非贈品 VIP 價加總）</div>
     <button class="event-save-btn" onclick="saveEventBundle()">儲存</button>
     <button class="event-cancel-btn" onclick="closeEventModal()">取消</button>
   </div>
@@ -573,7 +572,6 @@ function openEventModal(id){
   const ev=id!=null?events.find(e=>String(e.id)===String(id)):null;
   document.getElementById('eventModalTitle').textContent=ev?'編輯活動組合':'新增活動組合';
   document.getElementById('eventName').value=ev?ev.name:'';
-  document.getElementById('eventPrice').value=ev?ev.price:'';
   // 產生商品清單
   const prodList=document.getElementById('eventProdList');
   const allProds=ALL.filter(p=>p.s!=='創業');
@@ -588,8 +586,29 @@ function openEventModal(id){
     </div>`;
   }).join('');
   document.getElementById('eventModal').classList.add('open');
+  setTimeout(updateEventPricePreview,50);
 }
 
+function updateEventPricePreview(){
+  const allProds=ALL.filter(p=>p.s!=='創業');
+  const items=[];
+  allProds.forEach(p=>{
+    const cb=document.getElementById('eprod_'+p.name);
+    if(cb&&cb.checked){
+      const qty=parseInt(document.getElementById('eqty_'+p.name).value)||1;
+      const giftBtn=document.getElementById('egift_'+p.name);
+      const gift=!!(giftBtn&&giftBtn.classList.contains('on'));
+      items.push({name:p.name,qty,gift});
+    }
+  });
+  const price=calcEventPrice(items);
+  const preview=document.getElementById('eventPricePreview');
+  const amt=document.getElementById('eventPriceAmt');
+  if(preview&&amt){
+    preview.style.display=items.length?'block':'none';
+    amt.textContent=Math.round(price).toLocaleString();
+  }
+}
 function toggleEventProd(name){
   const cb=document.getElementById('eprod_'+name);
   const qtyInput=document.getElementById('eqty_'+name);
@@ -598,12 +617,14 @@ function toggleEventProd(name){
   if(giftBtn)giftBtn.style.display=cb.checked?'':'none';
   if(!cb.checked&&giftBtn){giftBtn.classList.remove('on');giftBtn.textContent='設贈品';}
   if(cb.checked)qtyInput.focus();
+  updateEventPricePreview();
 }
 function toggleEventGift(name){
   const btn=document.getElementById('egift_'+name);
   if(!btn)return;
   const isOn=btn.classList.toggle('on');
   btn.textContent=isOn?'贈品✓':'設贈品';
+  updateEventPricePreview();
 }
 
 function closeEventModal(){
@@ -611,11 +632,24 @@ function closeEventModal(){
   editingEventId=null;
 }
 
+function calcEventPrice(items){
+  let total=0;
+  items.forEach(item=>{
+    if(item.gift)return;
+    const prod=ALL.find(p=>p.name===item.name);
+    if(!prod)return;
+    let vip=0;
+    if(prod.retail&&prod.retail[2]!=null) vip=prod.retail[2];
+    else if(prod.retail&&prod.retail[0]!=null) vip=prod.retail[0];
+    else if(prod.fixed!=null) vip=prod.fixed;
+    total+=vip*item.qty;
+  });
+  return total;
+}
+
 function saveEventBundle(){
   const name=document.getElementById('eventName').value.trim();
-  const price=parseFloat(document.getElementById('eventPrice').value);
   if(!name){alert('請填入組合名稱');return;}
-  if(isNaN(price)||price<0){alert('請填入活動總價');return;}
   const allProds=ALL.filter(p=>p.s!=='創業');
   const items=[];
   allProds.forEach(p=>{
@@ -628,15 +662,25 @@ function saveEventBundle(){
     }
   });
   if(!items.length){alert('請至少選擇一個商品');return;}
+  const price=calcEventPrice(items);
   if(editingEventId!=null){
     const idx=events.findIndex(e=>String(e.id)===String(editingEventId));
-    if(idx>=0)events[idx]={...events[idx],name,price,items};
+    if(idx>=0){
+      events[idx]={...events[idx],name,price,items};
+      const oldKey=Object.keys(cart).find(k=>k.startsWith('活動_'+String(editingEventId)+'::'));
+      if(oldKey&&cart[oldKey]){
+        const qty=cart[oldKey];
+        delete cart[oldKey];
+        cart['活動_'+String(editingEventId)+'::'+name+'::'+price]=qty;
+      }
+    }
   } else {
     events.push({id:Date.now(),name,price,items});
   }
   saveEvents();
   closeEventModal();
   renderEventList();
+  updateSummary();
 }
 
 function deleteEvent(id){
