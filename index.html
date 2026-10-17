@@ -271,7 +271,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <option value="三級零售">三級零售</option>
         <option value="實習">實習</option>
       </select>
-      <select class="sell-type-select" id="sellType" onchange="renderGrid()">
+      <select class="sell-type-select" id="sellType" onchange="renderGrid();renderEventList()">
         <option value="r0">售：零售價</option>
         <option value="r1">售：任兩盒</option>
         <option value="r2">售：VIP價</option>
@@ -612,7 +612,7 @@ function updateEventPricePreview(){
       if(giftQty>0) items.push({name:p.name,qty:giftQty,gift:true});
     }
   });
-  const price=calcEventPrice(items);
+  const price=calcEventPrice(items,getSellType());
   const preview=document.getElementById('eventPricePreview');
   const amt=document.getElementById('eventPriceAmt');
   if(preview&&amt){
@@ -633,18 +633,15 @@ function closeEventModal(){
   editingEventId=null;
 }
 
-function calcEventPrice(items){
-  // 活動售價固定 = 非贈品商品的 VIP 價（retail[2]）× 數量加總
+function calcEventPrice(items,pt){
+  // 活動售價依右邊售價選單計算
+  if(!pt) pt=getSellType();
   let total=0;
   items.forEach(item=>{
     if(item.gift)return;
     const prod=ALL.find(p=>p.name===item.name);
     if(!prod)return;
-    let vip=0;
-    if(prod.retail&&prod.retail[2]!=null) vip=prod.retail[2];
-    else if(prod.retail&&prod.retail[0]!=null) vip=prod.retail[0];
-    else if(prod.fixed!=null) vip=prod.fixed;
-    total+=vip*item.qty;
+    total+=getSellPrice(prod,pt)*item.qty;
   });
   return total;
 }
@@ -664,7 +661,7 @@ function saveEventBundle(){
     }
   });
   if(!items.length){alert('請至少選擇一個商品');return;}
-  const price=calcEventPrice(items);
+  const price=calcEventPrice(items,getSellType());
   if(editingEventId!=null){
     const idx=events.findIndex(e=>String(e.id)===String(editingEventId));
     if(idx>=0){
@@ -696,7 +693,7 @@ function addEventToCart(id){
   const ev=events.find(e=>String(e.id)===String(id));
   if(!ev)return;
   // 加入購物車時用即時計算的售價（依右邊選單）
-  const evPrice=calcEventPrice(ev.items);
+  const evPrice=calcEventPrice(ev.items,getSellType());
   const key='活動_'+String(ev.id)+'::'+ev.name+'::'+evPrice;
   cart[key]=(cart[key]||0)+1;
   renderEventList();
@@ -722,7 +719,7 @@ function setEventQty(id,val){
   if(n<=0){
     if(existKey)delete cart[existKey];
   } else {
-    const evPrice=calcEventPrice(ev.items);
+    const evPrice=calcEventPrice(ev.items,getSellType());
     const key=existKey||('活動_'+String(id)+'::'+ev.name+'::'+evPrice);
     if(existKey&&existKey!==key){delete cart[existKey];}
     cart[key]=n;
@@ -736,10 +733,10 @@ function renderEventList(){
   const list=document.getElementById('eventList');
   if(!list)return;
   if(!events.length){list.innerHTML='<div class="event-empty">尚無活動組合<br>點上方「新增」建立</div>';return;}
-  const lv=getLevel();
+  const lv=getLevel(),pt=getSellType();
   list.innerHTML=events.map(ev=>{
     const prefix='活動_'+String(ev.id)+'::';
-    const evPrice=calcEventPrice(ev.items);
+    const evPrice=calcEventPrice(ev.items,pt);
     const evKey=Object.keys(cart).find(k=>k.startsWith(prefix))||('活動_'+String(ev.id)+'::'+ev.name+'::'+evPrice);
     const qty=cart[evKey]||0;
     const cost=ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0);
@@ -882,7 +879,7 @@ function updateSummary(){
       const parts=key.split('::');
       const eid=parts[0].slice(3);
       const ev=events.find(e=>String(e.id)===String(eid));
-      const evPrice=ev?calcEventPrice(ev.items):(parts[2]?parseFloat(parts[2])||0:0);
+      const evPrice=ev?calcEventPrice(ev.items,pt):(parts[2]?parseFloat(parts[2])||0:0);
       const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
       tR+=evPrice*qty;tP+=(evPrice-ecost)*qty;return;
     }
@@ -917,7 +914,7 @@ function saveOrder(){
       const eid=parts[0].slice(3);
       const ev=events.find(e=>String(e.id)===String(eid));
       const evName=ev?ev.name:(parts.length>=2?parts[1]:'活動組合');
-      const evPrice=ev?calcEventPrice(ev.items):(parts.length>=3?parseFloat(parts[2])||0:0);
+      const evPrice=ev?calcEventPrice(ev.items,pt):(parts.length>=3?parseFloat(parts[2])||0:0);
       const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
       const rev=evPrice*qty,profit=(evPrice-ecost)*qty;
       tR+=rev;tP+=profit;
@@ -1274,7 +1271,7 @@ function previewReceipt(){
       const eid=parts[0].slice(3);
       const ev=events.find(e=>String(e.id)===String(eid));
       const evName=ev?ev.name:(parts.length>=2?parts[1]:'活動組合');
-      const evPrice=ev?calcEventPrice(ev.items):(parts.length>=3?parseFloat(parts[2])||0:0);
+      const evPrice=ev?calcEventPrice(ev.items,pt):(parts.length>=3?parseFloat(parts[2])||0:0);
       if(!evName&&!evPrice)return '';
       const ecost=ev?ev.items.reduce((s,i)=>{if(i.gift)return s;const p=ALL.find(x=>x.name===i.name);return s+(p?p.costs[lv]||0:0)*i.qty;},0):0;
       const lineTotal=evPrice*qty;
